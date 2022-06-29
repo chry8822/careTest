@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+    <defs>
+        <style>
+            .cls-2,.cls-3{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:.5px}.cls-2{stroke:#fff}.cls-3{stroke:#ffc847}
+        </style>
+    </defs>
+    <g id="icon_5" transform="translate(-293 -373)">
+        <circle id="타원_35" cx="18" cy="18" r="18" fill="#7058ef" transform="translate(293 373)"/>
+        <g id="그룹_560" transform="translate(301.492 383.149)">
+            <g id="그룹_466">
+                <g id="그룹_465">
+                    <g id="그룹_464">
+                        <g id="그룹_463">
+                            <g id="그룹_462">
+                                <g id="그룹_461" transform="translate(2.838)">
+                                    <g id="그룹_460">
+                                        <g id="그룹_459">
+                                            <path id="패스_635" d="M501.038 1042.8a2.784 2.784 0 1 1-2.784-2.784 2.784 2.784 0 0 1 2.784 2.784z" class="cls-2" transform="translate(-495.469 -1040.02)"/>
+                                        </g>
+                                    </g>
+                                </g>
+                                <path id="패스_636" d="M489.448 1071.219v-5.309a2.194 2.194 0 0 1 2.377-1.946h6.491a2.195 2.195 0 0 1 2.377 1.946v5.309" class="cls-2" transform="translate(-489.448 -1056.818)"/>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g id="그룹_559" transform="translate(7.955)">
+                <g id="그룹_465-2">
+                    <g id="그룹_464-2">
+                        <g id="그룹_463-2">
+                            <g id="그룹_462-2">
+                                <g id="그룹_461-2" transform="translate(2.838)">
+                                    <g id="그룹_460-2">
+                                        <g id="그룹_459-2">
+                                            <path id="패스_635-2" d="M501.038 1042.8a2.784 2.784 0 1 1-2.784-2.784 2.784 2.784 0 0 1 2.784 2.784z" class="cls-3" transform="translate(-495.469 -1040.02)"/>
+                                        </g>
+                                    </g>
+                                </g>
+                                <path id="패스_636-2" d="M489.448 1071.219v-5.309a2.194 2.194 0 0 1 2.377-1.946h6.491a2.195 2.195 0 0 1 2.377 1.946v5.309" class="cls-3" transform="translate(-489.448 -1056.818)"/>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

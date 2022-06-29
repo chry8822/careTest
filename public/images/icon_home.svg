@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="65.2" height="43.169" viewBox="0 0 65.2 43.169">
+    <defs>
+        <style>
+            .cls-1,.cls-2{fill:#fff5b1;stroke:#8e6051;stroke-linecap:round;stroke-linejoin:round}.cls-2{fill:#fff}
+        </style>
+    </defs>
+    <g id="icon_home" transform="translate(-250 -872.237)">
+        <ellipse id="타원_499" cx="4.299" cy="6.588" class="cls-1" rx="4.299" ry="6.588" transform="translate(257.412 894.89)"/>
+        <path id="선_532" d="M0 0L0 13.1" class="cls-2" transform="translate(261.71 901.803)"/>
+        <ellipse id="타원_501" cx="3.342" cy="5.121" class="cls-1" rx="3.342" ry="5.121" transform="translate(252.65 899.6)"/>
+        <path id="선_534" d="M0 0L0 10.184" class="cls-2" transform="translate(255.991 904.721)"/>
+        <g id="그룹_4908" transform="translate(266.165 872.906)">
+            <path id="패스_14726" fill="#fff0eb" stroke="#8e6051" stroke-linecap="round" stroke-linejoin="round" d="M680.962 548.08h-33.388v-22.627l16.694-15.487 16.694 15.487z" transform="translate(-640.1 -506.08)"/>
+            <path id="패스_14727" fill="#bc8877" stroke="#8e6051" d="M682.272 530.711l-20.378-18.092-20.378 18.092-3.79-4.407 24.168-21.457 24.168 21.453z" transform="translate(-637.727 -504.846)"/>
+            <path id="패스_14728" fill="#bc8877" stroke="#8e6051" stroke-linecap="round" stroke-linejoin="round" d="M664.343 554.208v-13.1h8.711v13.1" transform="translate(-644.53 -512.208)"/>
+            <path id="사각형_2176" d="M0 0H4.529V4.529H0z" class="cls-1" transform="translate(11.537 28.573)"/>
+            <path id="사각형_2177" d="M0 0H4.529V4.529H0z" class="cls-1" transform="rotate(-180 18.399 16.551)"/>
+            <circle id="타원_502" cx="3.883" cy="3.883" r="3.883" class="cls-1" transform="translate(20.285 15.669)"/>
+        </g>
+        <path id="선_535" fill="none" stroke="#8e6051" stroke-linecap="round" stroke-linejoin="round" d="M0 0L63.606 0" transform="translate(250.5 914.906)"/>
+    </g>
+</svg>

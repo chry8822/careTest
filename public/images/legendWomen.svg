@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="9.995" height="20" viewBox="0 0 9.995 20">
+    <defs>
+        <style>
+            .cls-1{fill:#fec25c}
+        </style>
+    </defs>
+    <g id="icon_woman" transform="translate(0)">
+        <circle id="타원_21" cx="3.957" cy="3.957" r="3.957" class="cls-1" transform="translate(1.041 0)"/>
+        <path id="패스_138" d="M-202.417 1480.25h-5.432a1.084 1.084 0 0 0-1.171 1.057l-.98 8.971a1.181 1.181 0 0 0 1.275 1.057h7.444a1.181 1.181 0 0 0 1.275-1.057l-.937-8.971c.001-.584-.77-1.057-1.474-1.057z" class="cls-1" transform="translate(210 -1471.335)"/>
+    </g>
+</svg>

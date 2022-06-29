@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 90 90">
+    <defs>
+        <style>
+            .cls-1{fill:none}.cls-2{fill:#e1e1e1}
+        </style>
+    </defs>
+    <g id="그룹_1365" transform="translate(-135 -225)">
+        <path id="사각형_203" d="M0 0H90V90H0z" class="cls-1" transform="translate(135 225)"/>
+        <g id="그룹_247" transform="translate(-2.001 -3)">
+            <g id="그룹_246" transform="translate(-224 -407.837)">
+                <path id="패스_358" d="M387.841 678.024c-10.784 0-19.556-8.117-19.556-18.1s8.772-18.092 19.556-18.092 19.556 8.117 19.556 18.092-8.771 18.1-19.556 18.1zm0-32.987c-8.877 0-16.1 6.679-16.1 14.892s7.223 14.895 16.1 14.895 16.1-6.682 16.1-14.895-7.223-14.892-16.1-14.892z" class="cls-2" transform="translate(8.159)"/>
+                <path id="패스_359" d="M426.272 686.321h-60.544a1.668 1.668 0 0 1-1.728-1.6c0-16.344 14.356-29.642 32-29.642s32 13.3 32 29.642a1.668 1.668 0 0 1-1.728 1.6zm-58.767-3.2h56.989c-.9-13.838-13.335-24.841-28.495-24.841s-27.599 11.003-28.494 24.84z" class="cls-2" transform="translate(0 25.516)"/>
+            </g>
+            <g id="타원_17" fill="#fff" stroke="#e1e1e1" stroke-width="3px" transform="translate(188 278)">
+                <circle cx="18.5" cy="18.5" r="18.5" stroke="none"/>
+                <circle cx="18.5" cy="18.5" r="17" class="cls-1"/>
+            </g>
+            <g id="그룹_80" transform="translate(-620 -565.557)">
+                <g id="그룹_73" transform="rotate(-45 1456.198 -554.367)">
+                    <path id="패스_212" d="M17 3.617H1.811a1.808 1.808 0 1 1 0-3.617H17a1.808 1.808 0 1 1 0 3.617z" class="cls-2"/>
+                </g>
+                <g id="그룹_124" transform="rotate(45 -620.352 1418.118)">
+                    <path id="패스_212-2" d="M17 3.617H1.811a1.808 1.808 0 1 1 0-3.617H17a1.808 1.808 0 1 1 0 3.617z" class="cls-2"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

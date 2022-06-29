@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+    <defs>
+        <style>
+            .cls-2,.cls-3{fill:none;stroke:#859ace;stroke-linecap:round}.cls-2{stroke-linejoin:round}
+        </style>
+    </defs>
+    <g id="iconAge" transform="translate(-49 -569)">
+        <path id="사각형_2703" fill="none" d="M0 0H16V16H0z" transform="translate(49 569)"/>
+        <g id="그룹_3037" transform="translate(-248.934 472.967)">
+            <rect id="사각형_1424" width="14" height="12.138" class="cls-2" rx="1.829" transform="translate(298.934 98.896)"/>
+            <path id="선_311" d="M0 3.627L0 0" class="cls-2" transform="translate(302.854 97.034)"/>
+            <path id="선_312" d="M0 3.627L0 0" class="cls-2" transform="translate(309.014 97.034)"/>
+            <path id="패스_20626" d="M302.137 103.455h7.484" class="cls-3" transform="translate(0 0.51)"/>
+            <path id="패스_20627" d="M302.137 103.455h7.484" class="cls-3" transform="translate(0 3.51)"/>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="118" height="88" viewBox="0 0 118 88">
+    <defs>
+        <style>
+            .cls-2,.cls-5{fill:#fff}.cls-2{stroke:#555;stroke-linecap:round;stroke-linejoin:round;stroke-width:2px}
+        </style>
+    </defs>
+    <g id="icon_popup" transform="translate(-121 -190)">
+        <path id="사각형_2180" fill="none" d="M0 0H118V88H0z" transform="translate(121 190)"/>
+        <g id="그룹_4937" transform="translate(-531.5 -131.166)">
+            <path id="패스_14750" d="M728.735 341.5h19.432l-19.432-18.329z" class="cls-2"/>
+            <path id="패스_14751" d="M728.735 323.167H679.5v84.5h68.667V341.5z" class="cls-2"/>
+            <path id="선_541" d="M0 0L26.833 0" class="cls-2" transform="translate(691.167 339)"/>
+            <path id="패스_14752" fill="#efefef" d="M744.667 370.833a25.28 25.28 0 1 0-25.28 25.279 25.281 25.281 0 0 0 25.28-25.279z"/>
+            <path id="선_542" d="M0 0L20.667 0" class="cls-2" transform="translate(691.167 351.333)"/>
+            <path id="선_543" d="M0 0L14.167 0" class="cls-2" transform="translate(691.167 363.667)"/>
+            <path id="선_544" d="M0 0L20.667 0" class="cls-2" transform="translate(691.167 376)"/>
+            <path id="선_545" d="M0 0L26.833 0" class="cls-2" transform="translate(691.167 388.333)"/>
+            <path id="패스_14753" d="M729.224 342.86l.2-18.916 18.026 18.848z" class="cls-2" transform="rotate(-3 719.329 331.451)"/>
+            <g id="그룹_4936">
+                <path id="패스_14754" fill="#bc8877" stroke="#555" stroke-linecap="round" stroke-linejoin="round" stroke-width="2px" d="M759.882 351.5h-36.225a4.328 4.328 0 0 0-4.483 4.152v21.564a4.328 4.328 0 0 0 4.483 4.152h13.068L733.979 387l12.835-5.632h13.068a4.327 4.327 0 0 0 4.484-4.152v-21.564a4.327 4.327 0 0 0-4.484-4.152z"/>
+            </g>
+            <circle id="타원_503" cx="2.531" cy="2.531" r="2.531" class="cls-5" transform="translate(729.125 364.063)"/>
+            <circle id="타원_504" cx="2.531" cy="2.531" r="2.531" class="cls-5" transform="translate(739.313 364.063)"/>
+            <circle id="타원_505" cx="2.531" cy="2.531" r="2.531" class="cls-5" transform="translate(749.5 364.063)"/>
+        </g>
+    </g>
+</svg>

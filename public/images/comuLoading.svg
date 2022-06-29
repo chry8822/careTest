@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+    <g>
+        <g transform="translate(9.59)">
+            <rect width="2.819" height="6.125" fill="#8a8a8a" rx="1.41"/>
+        </g>
+    </g>
+    <g>
+        <g>
+            <path fill="#8a8a8a" d="M1.41 0a1.41 1.41 0 0 1 1.41 1.41v3.305a1.41 1.41 0 0 1-1.41 1.41A1.41 1.41 0 0 1 0 4.715V1.41A1.41 1.41 0 0 1 1.41 0z" opacity="0.4" transform="translate(9.59 15.875)"/>
+        </g>
+    </g>
+    <g>
+        <g transform="translate(0 9.59) translate(0 0)">
+            <rect width="2.819" height="6.125" fill="#8a8a8a" opacity="0.6" rx="1.41" transform="translate(0 2.819) rotate(-90)"/>
+        </g>
+    </g>
+    <g>
+        <g transform="translate(15.875 9.59) translate(0 0)">
+            <rect width="2.819" height="6.125" fill="#8a8a8a" opacity="0.2" rx="1.41" transform="translate(0 2.819) rotate(-90)"/>
+        </g>
+    </g>
+    <g>
+        <g transform="translate(2.24 13.435) translate(0 0)">
+            <rect width="2.819" height="6.125" fill="#8a8a8a" opacity="0.5" rx="1.41" transform="translate(1.994 6.325) rotate(-135)"/>
+        </g>
+    </g>
+    <g>
+        <g transform="translate(13.435 2.24) translate(0 0)">
+            <rect width="2.819" height="6.125" fill="#8a8a8a" opacity="0.1" rx="1.41" transform="translate(1.994 6.325) rotate(-135)"/>
+        </g>
+    </g>
+    <g>
+        <g>
+            <path fill="#8a8a8a" d="M1.409 0a1.41 1.41 0 0 1 1.41 1.41v3.305a1.41 1.41 0 0 1-1.41 1.41A1.409 1.409 0 0 1 0 4.716V1.409A1.409 1.409 0 0 1 1.409 0z" opacity="0.3" transform="translate(13.435 13.435) translate(0 0) matrix(-0.707, 0.707, -0.707, -0.707, 6.324, 4.332)"/>
+        </g>
+    </g>
+    <g>
+        <g transform="translate(2.241 2.24) translate(0 0)">
+            <rect width="2.819" height="6.125" fill="#8a8a8a" opacity="0.7" rx="1.41" transform="matrix(-0.707, 0.707, -0.707, -0.707, 6.324, 4.332)"/>
+        </g>
+    </g>
+</svg>

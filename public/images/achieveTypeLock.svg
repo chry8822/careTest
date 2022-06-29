@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="37.5" height="47.721" viewBox="0 0 37.5 47.721">
+    <defs>
+        <style>
+            .cls-1{fill:#e1e1e1;stroke:#aeb0b5;stroke-width:1.5px}
+        </style>
+    </defs>
+    <g id="icon_lock" transform="translate(192.567 -279.251)">
+        <path id="패스_14644" d="M-159.114 298.248h-2.593v-8.475a7.1 7.1 0 0 0-7.025-7.134h-.012a7.1 7.1 0 0 0-7.013 7.159l.011 7.872h-2.593l-.011-7.872a9.714 9.714 0 0 1 9.6-9.8h.016a9.714 9.714 0 0 1 9.618 9.77z" class="cls-1" transform="translate(-4.708)"/>
+        <g id="그룹_4795" transform="translate(-191.817 294.5)">
+            <path id="패스_14642" d="M-165.684 301.984a9.973 9.973 0 0 0-7.96 4 9.949 9.949 0 0 0-7.968-3.976 10.1 10.1 0 0 0-10.02 10.2c.009 5.622 10.059 14.748 10.059 14.748l7.971 6.531 7.957-6.556s10.023-9.158 10.014-14.78a10.11 10.11 0 0 0-10.053-10.167z" class="cls-1" transform="translate(191.631 -301.984)"/>
+        </g>
+        <path id="합치기_12" fill="#fff" stroke="#aeb0b5" stroke-miterlimit="10" stroke-width="1.5px" d="M2.082 6.808A3.564 3.564 0 1 1 5.057 6.8l.009 5.076-2.974.006z" transform="translate(-177.273 304.098)"/>
+    </g>
+</svg>

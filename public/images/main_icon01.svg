@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="23.366" height="29.003" viewBox="0 0 23.366 29.003">
+    <defs>
+        <style>
+            .cls-1,.cls-2{fill:#fff;stroke:#8e6051;stroke-linecap:round;stroke-linejoin:round}.cls-2{fill:#fff5b1}
+        </style>
+    </defs>
+    <g id="iconGuide" transform="translate(-544.488 -522.739)">
+        <g id="그룹_5739" transform="translate(548.212 527.766)">
+            <ellipse id="타원_538" cx="3.424" cy="1.832" class="cls-1" rx="3.424" ry="1.832" transform="translate(4.536 19.814)"/>
+            <path id="패스_16132" d="M568.162 540.052a7.963 7.963 0 0 0-15.872-.863 7.824 7.824 0 0 0 1.746 5.848 9.539 9.539 0 0 1 1.9 3.986l.012.053a2.639 2.639 0 0 0 2.58 2.052h3.32a2.64 2.64 0 0 0 2.58-2.052 9.427 9.427 0 0 1 1.906-4 7.812 7.812 0 0 0 1.828-5.024z" class="cls-1" transform="translate(-552.243 -532.151)"/>
+            <rect id="사각형_2454" width="8.858" height="1.843" class="cls-2" rx=".921" transform="translate(3.531 18.265)"/>
+            <rect id="사각형_2455" width="8.858" height="1.843" class="cls-2" rx=".921" transform="translate(3.531 20.108)"/>
+        </g>
+        <path id="패스_16133" d="M567.915 546.974l-.821 10.765H564l-.821-10.765" class="cls-1" transform="translate(-9.374 -11.713)"/>
+        <circle id="타원_539" cx="4.278" cy="4.278" r="4.278" transform="translate(551.894 531.604)" style="mix-blend-mode:darken;isolation:isolate" fill="#fff5b1"/>
+        <path id="선_582" d="M0 2.512L0 0" class="cls-1" transform="translate(556.171 523.239)"/>
+        <path id="선_583" d="M1.256 2.176L0 0" class="cls-1" transform="translate(549.822 524.932)"/>
+        <path id="선_584" d="M2.176 1.256L0 0" class="cls-1" transform="translate(545.171 529.561)"/>
+        <path id="선_587" d="M0 2.176L1.256 0" class="cls-1" transform="translate(561.264 524.932)"/>
+        <path id="선_588" d="M0 1.256L2.176 0" class="cls-1" transform="translate(564.996 529.561)"/>
+    </g>
+</svg>

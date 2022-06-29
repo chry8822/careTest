@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+    <defs>
+        <style>
+            .cls-1{fill:#333}
+        </style>
+    </defs>
+    <g id="그룹_664" transform="translate(-462.24 -361.322)">
+        <g id="그룹_534" transform="translate(475.442 368.799)">
+            <path id="패스_897" d="M553.97 413.36h-.943a.523.523 0 0 1 0-1.046h.943a.523.523 0 0 1 0 1.046z" class="cls-1" transform="translate(-552.504 -412.314)"/>
+        </g>
+        <g id="그룹_535" transform="translate(462.24 361.322)">
+            <path id="패스_898" d="M470.24 377.322a8 8 0 1 1 8-8 8.009 8.009 0 0 1-8 8zm0-14.973a6.972 6.972 0 1 0 6.972 6.973 6.98 6.98 0 0 0-6.972-6.972z" class="cls-1" transform="translate(-462.24 -361.322)"/>
+        </g>
+        <g id="그룹_536" transform="translate(469.717 361.353)">
+            <path id="패스_899" d="M513.754 363.625a.523.523 0 0 1-.523-.523v-1.052a.523.523 0 1 1 1.046 0v1.05a.523.523 0 0 1-.523.525z" class="cls-1" transform="translate(-513.231 -361.527)"/>
+        </g>
+        <g id="그룹_537" transform="translate(469.717 375.194)">
+            <path id="패스_900" d="M513.754 458.166a.523.523 0 0 1-.523-.523v-1.051a.523.523 0 1 1 1.046 0v1.051a.523.523 0 0 1-.523.523z" class="cls-1" transform="translate(-513.231 -456.069)"/>
+        </g>
+        <g id="그룹_538" transform="translate(462.271 368.799)">
+            <path id="패스_901" d="M464.02 413.36h-1.051a.523.523 0 0 1 0-1.046h1.051a.523.523 0 0 1 0 1.046z" class="cls-1" transform="translate(-462.446 -412.314)"/>
+        </g>
+        <g id="그룹_539" transform="translate(469.665 368.799)">
+            <path id="패스_902" d="M517.784 413.36h-4.03a.523.523 0 0 1 0-1.046h4.03a.523.523 0 0 1 0 1.046z" class="cls-1" transform="translate(-513.231 -412.314)"/>
+        </g>
+        <g id="그룹_540" transform="translate(469.717 364.199)">
+            <path id="패스_903" d="M513.754 386.709a.523.523 0 0 1-.523-.523v-4.558a.523.523 0 0 1 1.046 0v4.558a.523.523 0 0 1-.523.523z" class="cls-1" transform="translate(-513.231 -381.105)"/>
+        </g>
+    </g>
+</svg>
