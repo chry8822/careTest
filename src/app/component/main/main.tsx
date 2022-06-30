@@ -1,4 +1,4 @@
-import React,{ useState } from 'react';
+import React,{ useEffect, useState, useCallback , useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { hidePopup } from '../../redux/actions/popup/popup';
@@ -8,39 +8,132 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from "swiper";
 import 'swiper/css';
 import "swiper/css/navigation";
-import Chart from '../common/chart'
+import { MemoPiechart } from '../common/chart'
+import Api from '../../api/api'
+type mainStateType = {
+        jobs: any[];
+        applicantList: any[];
+        lowestPriceJobList: any[];
+        careUseList: {
+            jobCnt: number,
+            jobMatchingCnt: number,
+            jobCareTimeYear: number,
+            jobCareTimeMonth: number,
+            jobAmountTotal: number,
+            accumulatedAmount: number
+        };
+        patientsCnt: number;
+        userRate: {
+            localRate: number,
+            foreignerRate: number,
+            manRate: number,
+            womanRate: number,
+            cgsUsersTotal: number
+        };
+        pieChartData: any[];
+        mainReviewList: any[];
+}
+
 
 const Main = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const [ mainBannerIndex, setMainBannerIndex ] = useState(1)
+    const [ mainBannerPosition, setMainBannerPosition ] = useState(1)
+    const [ mainData, setMainData ] = useState<mainStateType>({
+        jobs: [],
+        applicantList: [],        
+        lowestPriceJobList: [],   
+        careUseList: {            
+            jobCnt: 0,           
+            jobMatchingCnt: 0,    
+            jobCareTimeYear: 0,   
+            jobCareTimeMonth: 0,  
+            jobAmountTotal: 0,    
+            accumulatedAmount: 0  
+        },
+        patientsCnt: 0,       
+        userRate: {           
+            localRate: 0,     
+            foreignerRate: 0, 
+            manRate: 0,       
+            womanRate: 0,     
+            cgsUsersTotal: 0  
+        },
+        pieChartData: [],     
+        mainReviewList: []    
+    }
+)
+
+    useEffect(() => {
+        mainListApi()
+    },[])
 
 
+
+
+    const mainListApi = () => {
+        Api.mainList().then((response: any) => {
+            if(response.status === 200) {
+                let data = response.data;
+                if (data.code === 200) {
+                    let tempCareUseList: any = {};
+                    if (data.data.use_list) {
+                        let jobCareTime: number = Number(data.data.use_list.job_care_time);
+                        tempCareUseList = {
+                            jobCnt: data.data.use_list.job_cnt,
+                            jobMatchingCnt: data.data.use_list.job_matching_cnt,
+                            jobCareTimeYear: Math.floor(jobCareTime / 365),
+                            jobCareTimeMonth: jobCareTime % 365,
+                            jobAmountTotal: data.data.use_list.job_amount_total,
+                            accumulatedAmount: data.data.use_list.accumulated_amount
+                        };
+                    }
+                    let job: any = {
+                        ...mainData,
+                        jobs: data.data.jobs,
+                        applicantList: data.data.applicant,
+                        lowestPriceJobList: [],
+                        careUseList: tempCareUseList,
+                        patientsCnt: data.data.patients_cnt,
+                        userRate: {
+                            localRate: parseFloat(Number(data.data.user_rate.local_rate).toFixed(1)),
+                            foreignerRate: parseFloat(Number(data.data.user_rate.foreigner_rate).toFixed(1)),
+                            manRate: parseFloat(Number(data.data.user_rate.man_rate).toFixed(1)),
+                            womanRate: parseFloat(Number(data.data.user_rate.woman_rate).toFixed(1)),
+                            cgsUsersTotal: Number(data.data.user_rate.cgs_users_total)
+                        },
+                        pieChartData: [{
+                            data: [parseFloat(Number(data.data.user_rate.local_rate).toFixed(1)), parseFloat(Number(data.data.user_rate.foreigner_rate).toFixed(1))],
+                            backgroundColor: ["#bc8877", "#e8bdaf"],
+                            borderWidth: 0
+                        }],
+                        mainReviewList: data.data.rating
+                    }
+                    setMainData(job)
+                }
+            }
+        }).catch(err => {
+            console.log(err)
+        })
+        
+    }
+
+
+    // 메인 배인 렌더링
     const renderMainbanner = () => {
-        // let settings = {
-        //     // slidesPerVie : 1,
-        //     loop : true,
-        //     Pagination: {clickable : true},
-        //     // navigation : true,
-        //     // modules : [Pagination],
-        //     className: "mySwiper",
-        //     direction : "vertical" as const
-        // }
-
         return (
             <Swiper
                 spaceBetween={30}
                 slidesPerView={1}
-                pagination={{
-                    clickable: true
-                }}
                 className="mySwiper"
                 loop={true}
-                modules={[Navigation,Autoplay]}
+                modules={[Autoplay]}
                 onSlideChange={(e)=> {
-                    setMainBannerIndex(e.realIndex + 1)
+                    setMainBannerPosition(e.realIndex + 1)
                 }}
                 autoplay={{delay:1000}}
+                allowTouchMove={true}
             >
                 <SwiperSlide>
                     <article className="mainInsur">
@@ -69,8 +162,7 @@ const Main = () => {
                 </SwiperSlide>
             </Swiper>
         )
-    }
-
+    } 
 
 
 
@@ -112,45 +204,11 @@ const Main = () => {
                     <section className="breakLine">
                         <div className="mainBanSlick">
                             {renderMainbanner()} 
-                            <div style={{zIndex: 1}} className="mainBanSlick__page"><span>{mainBannerIndex}</span> / 3</div>
+                            <div style={{zIndex: 1}} className="mainBanSlick__page"><span>{mainBannerPosition}</span> / 3</div>
                         </div>
 
                         <article className="mainBgGray">
-                            {/* <!-- <div className="commonWrap02">
-                                <div className="penaltyInfo">
-                                <h2 className="txtStyle02">서비스 이용제한 안내</h2>
-                                <p className="txtStyle04">
-                                    이용약관에 의거하여 아래의 기간동안 <strong>공고등록이 불가</strong>합니다.
-                                </p>
-                                <p className="txtStyle05-C555">
-                                    서비스 이용제한 기간동안 '탈퇴 후 재가입'을 하시는 경우, 추가적인 제재가
-                                    가해집니다.
-                                </p>
-                                <dl className="penaltyInfo__detail">
-                                    <div>
-                                    <dt>제한 내용</dt>
-                                    <dd>공고등록 금지</dd>
-                                    </div>
-                                    <div>
-                                    <dt>제한 사유</dt>
-                                    <dd>반복적인 당일 간병 취소</dd>
-                                    </div>
-                                    <div>
-                                    <dt>제한 기간</dt>
-                                    <dd>YY.MM.DD hh:mm ~ YY.MM.DD hh:mm</dd>
-                                    </div>
-                                </dl>
-                                <p className="txtStyle05-C555">
-                                    또한, 반복적인 위반행위적발 또는 회사의 판단에 따라 '회원자격상실' 제재가 가해질
-                                    수 있으며, 회원 자격 상실된 회원은 재가입 및 서비스 이용이 불가합니다. 자세한
-                                    사항은 이용약관을 확인해주세요.
-                                </p>
-                                <p className="txtStyle05-C555">
-                                    서비스 제한과 관련 문의가 있으시면 고객센터로 문의해주세요.
-                                </p>
-                                <a href="">이용약관 보기</a>
-                                </div>
-                            </div> --> */}
+                        
                             <div className="commonWrap12">
                                 {/* <!--
                             모바일 웹일 때 : 공고 없을 경우 공고 없다는 메세지가 따로 보여지게 / 공고 리스트는 app과 같은 형식으로 진행
@@ -161,7 +219,7 @@ const Main = () => {
                                     </div>
                                     <div className="mainJobList__none">
                                         <img src="../images/noneMainList.svg" alt="" />
-                                        <p className="txtStyle04-W500">등록하신 공고가 없습니다.</p>
+                                        {/* <p className="txtStyle04-W500">{mainData.userRate.localRate}</p> */}
                                     </div>
                                     <ul className="Job__list">
                                         <li>
@@ -267,7 +325,7 @@ const Main = () => {
                                         <div className="mainChart__pie">
                                             {/* 차트 넣는 자리 */}
                                             <div style={{padding:"16px 0 20px", margin:"16px 0 20px"}}>
-                                                {Chart()}
+                                                <MemoPiechart graph={mainData.pieChartData}/>
                                             </div>
                                         </div>
                                         <div className="mainChart__legend">

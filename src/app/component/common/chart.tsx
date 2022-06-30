@@ -2,11 +2,13 @@ import * as React from 'react';
 import { ResponsivePie } from '@nivo/pie';
 
 interface PieChartProps{
-    graph: any;
+    graph: any[];
 }
 
-// const Piechart = ({graph}: PieChartProps) => {
-    const Piechart = () => {
+// const Piechart = () => {
+const Piechart = ({graph}: PieChartProps) => {
+//    const data = graph.map((item) => )
+//    console.log(data)
     return (
         // chart height가 100%이기 때문이 chart를 덮는 마크업 요소에 height 설정
             <div style={{width: "126px", height: "126px"}}>
@@ -20,8 +22,8 @@ interface PieChartProps{
                     data={[
                         {
                             id: "내국인",
-                            value: 90,
-                            // value: graph.data[0]
+                            // value: 90,
+                            // value: graph
                             color: "#bc8877" 
                         },
                         {
@@ -125,5 +127,5 @@ interface PieChartProps{
     );
 };
 
-export default Piechart;
+export const MemoPiechart = React.memo(Piechart);
  
