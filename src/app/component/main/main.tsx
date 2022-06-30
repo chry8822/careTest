@@ -7,7 +7,7 @@ import Header from '../common/header';
 
 
 const Main = () => {
-
+console.log("12")
     const dispatch = useDispatch();
 
     //##################################################################################################################
