@@ -1,14 +1,84 @@
-import React from 'react';
+import React,{ useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { hidePopup } from '../../redux/actions/popup/popup';
 import MainNavigator from './navigator/navigator'
 import Header from '../common/header';
-
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Autoplay } from "swiper";
+import 'swiper/css';
+import "swiper/css/navigation";
+import Chart from '../common/chart'
 
 const Main = () => {
-console.log("12")
     const dispatch = useDispatch();
+
+    const [ mainBannerIndex, setMainBannerIndex ] = useState(1)
+
+
+    const renderMainbanner = () => {
+        // let settings = {
+        //     // slidesPerVie : 1,
+        //     loop : true,
+        //     Pagination: {clickable : true},
+        //     // navigation : true,
+        //     // modules : [Pagination],
+        //     className: "mySwiper",
+        //     direction : "vertical" as const
+        // }
+
+        return (
+            <Swiper
+                spaceBetween={30}
+                slidesPerView={1}
+                pagination={{
+                    clickable: true
+                }}
+                className="mySwiper"
+                loop={true}
+                modules={[Navigation,Autoplay]}
+                onSlideChange={(e)=> {
+                    setMainBannerIndex(e.realIndex + 1)
+                }}
+                autoplay={{delay:1000}}
+            >
+                <SwiperSlide>
+                    <article className="mainInsur">
+                        <p className="txtStyle05-C333">국내 최초 보험 가입 자동화</p>
+                        <h2 className="txtStyle01">
+                        삼성화재<br />
+                        간병인배상책임보험 출시
+                        </h2>
+                        <img src="../images/mainInsurLogo.svg" alt="케어네이션 x 삼성화재" />
+                   </article>
+                </SwiperSlide>
+                <SwiperSlide>
+                    <article className="mainImg">
+                        <div className="mainImg__txt">
+                        <img src="../images/loginTit.svg" alt="대한민국 1등 간병앱" />
+                        <h2 className="txtStyle01">
+                            <strong>서울</strong>에서 <strong>제주</strong>까지<br />
+                            24시간 <strong>실시간</strong> 매칭 중!
+                        </h2>
+                        <p className="txtStyle05-C333">가장 많은 간병인이 선택했어요!</p>
+                        </div>
+                    </article>
+                </SwiperSlide>
+                <SwiperSlide>
+                    <article className="careMateBan"></article>
+                </SwiperSlide>
+            </Swiper>
+        )
+    }
+
+
+
+
+
+
+
+
+
 
     //##################################################################################################################
     //##
@@ -22,9 +92,9 @@ console.log("12")
      *
      * @param type : result Type
      */
-        const popupAction = (type: string) => {
-            dispatch(hidePopup());
-        }
+    const popupAction = (type: string) => {
+        dispatch(hidePopup());
+    }
 
 
     //##################################################################################################################
@@ -35,35 +105,17 @@ console.log("12")
 
     return (
         <>
-           <Header 
-           />
-           <main>
-            <div className="subWrap">
-                <section className="breakLine">
-                    <div className="mainBanSlick">
-                        <article className="mainInsur">
-                            <p className="txtStyle05-C333">국내 최초 보험 가입 자동화</p>
-                            <h2 className="txtStyle01">
-                            삼성화재<br />
-                            간병인배상책임보험 출시
-                            </h2>
-                            <img src="../images/mainInsurLogo.svg" alt="케어네이션 x 삼성화재" />
-                        </article>
-                        <article className="mainImg">
-                            <div className="mainImg__txt">
-                            <img src="../images/loginTit.svg" alt="대한민국 1등 간병앱" />
-                            <h2 className="txtStyle01">
-                                <strong>서울</strong>에서 <strong>제주</strong>까지<br />
-                                24시간 <strong>실시간</strong> 매칭 중!
-                            </h2>
-                            <p className="txtStyle05-C333">가장 많은 간병인이 선택했어요!</p>
-                            </div>
-                        </article>
-                        <article className="careMateBan"></article>
-                        <div className="mainBanSlick__page"><span>1 </span> / 3</div>
-                    </div>
+            <Header
+            />
+            <main>
+                <div className="subWrap">
+                    <section className="breakLine">
+                        <div className="mainBanSlick">
+                            {renderMainbanner()} 
+                            <div style={{zIndex: 1}} className="mainBanSlick__page"><span>{mainBannerIndex}</span> / 3</div>
+                        </div>
 
-                    <article className="mainBgGray">
+                        <article className="mainBgGray">
                             {/* <!-- <div className="commonWrap02">
                                 <div className="penaltyInfo">
                                 <h2 className="txtStyle02">서비스 이용제한 안내</h2>
@@ -99,105 +151,105 @@ console.log("12")
                                 <a href="">이용약관 보기</a>
                                 </div>
                             </div> --> */}
-                        <div className="commonWrap12">
-                            {/* <!--
+                            <div className="commonWrap12">
+                                {/* <!--
                             모바일 웹일 때 : 공고 없을 경우 공고 없다는 메세지가 따로 보여지게 / 공고 리스트는 app과 같은 형식으로 진행
                             --> */}
-                            <div className="mainJobList">
-                                <div className="Job__tit">
-                                    <h2 className="txtStyle02">공고 목록 (<span>2</span>/3)</h2>
-                                </div>
-                                <div className="mainJobList__none">
-                                    <img src="../images/noneMainList.svg" alt="" />
-                                    <p className="txtStyle04-W500">등록하신 공고가 없습니다.</p>
-                                </div>
-                                <ul className="Job__list">
-                                    <li>
-                                        <a href="">
-                                            <img
-                                            src="../images/timeCareDownLabel.svg"
-                                            alt="시간제 간병"
-                                            className="timeCareLabel"
-                                            />
-                                            <div className="Job__list--label">
-                                                <span className="label RD">진행중</span>
-                                                <span className="label GY">지원한 케어메이트 : 2명</span>
-                                            </div>
-                                            <dl className="Job__list--info">
-                                                <div>
-                                                    <dt>간병일</dt>
-                                                    <dd>06월 24일 21시</dd>
+                                <div className="mainJobList">
+                                    <div className="Job__tit">
+                                        <h2 className="txtStyle02">공고 목록 (<span>2</span>/3)</h2>
+                                    </div>
+                                    <div className="mainJobList__none">
+                                        <img src="../images/noneMainList.svg" alt="" />
+                                        <p className="txtStyle04-W500">등록하신 공고가 없습니다.</p>
+                                    </div>
+                                    <ul className="Job__list">
+                                        <li>
+                                            <a href="">
+                                                <img
+                                                    src="../images/timeCareDownLabel.svg"
+                                                    alt="시간제 간병"
+                                                    className="timeCareLabel"
+                                                />
+                                                <div className="Job__list--label">
+                                                    <span className="label RD">진행중</span>
+                                                    <span className="label GY">지원한 케어메이트 : 2명</span>
                                                 </div>
-                                                <div>
-                                                    <dt>현재 최저가</dt>
-                                                    <dd>80,000원</dd>
+                                                <dl className="Job__list--info">
+                                                    <div>
+                                                        <dt>간병일</dt>
+                                                        <dd>06월 24일 21시</dd>
+                                                    </div>
+                                                    <div>
+                                                        <dt>현재 최저가</dt>
+                                                        <dd>80,000원</dd>
+                                                    </div>
+                                                </dl>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="mainJobList">
+                                    <div className="Job__tit">
+                                        <h2 className="txtStyle02">최저가 지원 현황</h2>
+                                    </div>
+                                    <ul className="Job__list">
+                                        <li>
+                                            <a href="">
+                                                <img
+                                                    src="../images/timeCareDownLabel.svg"
+                                                    alt="시간제 간병"
+                                                    className="timeCareLabel"
+                                                />
+                                                <div className="Job__list--label">
+                                                    <span className="label RD">진행중</span>
+                                                    <span className="label GY">지원한 케어메이트 : 2명</span>
                                                 </div>
-                                            </dl>
-                                        </a>
-                                    </li>
-                                </ul>
+                                                <dl className="Job__list--info">
+                                                    <div>
+                                                        <dt>간병일</dt>
+                                                        <dd>06월 24일 21시</dd>
+                                                    </div>
+                                                    <div>
+                                                        <dt>현재 최저가</dt>
+                                                        <dd>80,000원</dd>
+                                                    </div>
+                                                </dl>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="">
+                                                <img
+                                                    src="../images/timeCareUpLabel.svg"
+                                                    alt="시간제 간병"
+                                                    className="timeCareLabel"
+                                                />
+                                                {/* <!-- 마감 시간 있는 것만 strong 태그 추가--> */}
+                                                <div className="Job__list--label">
+                                                    <span className="label RD"><strong>마감 00시간 00분 00초</strong></span>
+                                                    <span className="label GN">지원한 케어메이트 : 5명</span>
+                                                </div>
+                                                <dl className="Job__list--info">
+                                                    <div>
+                                                        <dt>간병일</dt>
+                                                        <dd>06월 24일 21시</dd>
+                                                    </div>
+                                                    <div>
+                                                        <dt>현재 최저가</dt>
+                                                        <dd>80,000원</dd>
+                                                    </div>
+                                                </dl>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    {/* <!-- mainJob__btn 클릭시 open 추가 --> */}
+                                    <button type="button" className="mainJob__btn open">
+                                        <span>00</span>건의 간병 현황 더 보기
+                                    </button>
+                                </div>
                             </div>
-                            <div className="mainJobList">
-                                <div className="Job__tit">
-                                    <h2 className="txtStyle02">최저가 지원 현황</h2>
-                                </div>
-                                <ul className="Job__list">
-                                    <li>
-                                        <a href="">
-                                            <img
-                                            src="../images/timeCareDownLabel.svg"
-                                            alt="시간제 간병"
-                                            className="timeCareLabel"
-                                            />
-                                            <div className="Job__list--label">
-                                                <span className="label RD">진행중</span>
-                                                <span className="label GY">지원한 케어메이트 : 2명</span>
-                                            </div>
-                                            <dl className="Job__list--info">
-                                                <div>
-                                                    <dt>간병일</dt>
-                                                    <dd>06월 24일 21시</dd>
-                                                </div>
-                                                <div>
-                                                    <dt>현재 최저가</dt>
-                                                    <dd>80,000원</dd>
-                                                </div>
-                                            </dl>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="">
-                                            <img
-                                            src="../images/timeCareUpLabel.svg"
-                                            alt="시간제 간병"
-                                            className="timeCareLabel"
-                                            />
-                                            {/* <!-- 마감 시간 있는 것만 strong 태그 추가--> */}
-                                            <div className="Job__list--label">
-                                                <span className="label RD"><strong>마감 00시간 00분 00초</strong></span>
-                                                <span className="label GN">지원한 케어메이트 : 5명</span>
-                                            </div>
-                                            <dl className="Job__list--info">
-                                                <div>
-                                                    <dt>간병일</dt>
-                                                    <dd>06월 24일 21시</dd>
-                                                </div>
-                                                <div>
-                                                    <dt>현재 최저가</dt>
-                                                    <dd>80,000원</dd>
-                                                </div>
-                                            </dl>
-                                        </a>
-                                    </li>
-                                </ul>
-                                {/* <!-- mainJob__btn 클릭시 open 추가 --> */}
-                                <button type="button" className="mainJob__btn open">
-                                    <span>00</span>건의 간병 현황 더 보기
-                                </button>
-                            </div>
-                        </div>
-                    </article>
-                </section>
+                        </article>
+                    </section>
                     <section className="mainItemWrap">
                         <article className="mainStatus breakLine pt28">
                             <div className="mainItemWrap__tit">
@@ -213,24 +265,26 @@ console.log("12")
                                     </dl>
                                     <div className="mainChart">
                                         <div className="mainChart__pie">
-                                        {/* 차트 넣는 자리 */}
-                                        <canvas></canvas>
+                                            {/* 차트 넣는 자리 */}
+                                            <div style={{padding:"16px 0 20px", margin:"16px 0 20px"}}>
+                                                {Chart()}
+                                            </div>
                                         </div>
                                         <div className="mainChart__legend">
-                                        <dl>
-                                            <div>
-                                                <dt>내국인</dt>
-                                                <dd>80.1</dd>
-                                            </div>
-                                            <div>
-                                                <dt>외국인</dt>
-                                                <dd>20.2</dd>
-                                            </div>
-                                        </dl>
+                                            <dl>
+                                                <div>
+                                                    <dt>내국인</dt>
+                                                    <dd>80.1</dd>
+                                                </div>
+                                                <div>
+                                                    <dt>외국인</dt>
+                                                    <dd>20.2</dd>
+                                                </div>
+                                            </dl>
                                         </div>
                                         <div className="mainChart__line">
                                             <div className="mainChart__line--chart">
-                                                <div style={{width: "41%"}}></div>
+                                                <div style={{ width: "41%" }}></div>
                                             </div>
                                             <div className="mainChart__line--detail">
                                                 <p>여성 : <span>41.2</span></p>
@@ -256,6 +310,10 @@ console.log("12")
                                 </div>
                             </div>
                         </article>
+
+
+
+
                         <article className="mainRev breakLine">
                             <div className="mainRev__Tit">
                                 <h2 className="txtStyle02">보호자님이 남긴 후기</h2>
@@ -265,7 +323,7 @@ console.log("12")
                                 <a href="">
                                     <div className="mainRev__link--tit">
                                         <h3 className="txtStyle05-Wbold">
-                                        홍*동 <span className="txtStyle06-C777W500">보호자</span>
+                                            홍*동 <span className="txtStyle06-C777W500">보호자</span>
                                         </h3>
                                         <time className="txtStyle06-C777">1분전</time>
                                     </div>
@@ -281,7 +339,7 @@ console.log("12")
                                 <a href="">
                                     <div className="mainRev__link--tit">
                                         <h3 className="txtStyle05-Wbold">
-                                        홍*동 <span className="txtStyle06-C777W500">보호자</span>
+                                            홍*동 <span className="txtStyle06-C777W500">보호자</span>
                                         </h3>
                                         <time className="txtStyle06-C777">1분전</time>
                                     </div>
@@ -297,7 +355,7 @@ console.log("12")
                                 <a href="">
                                     <div className="mainRev__link--tit">
                                         <h3 className="txtStyle05-Wbold">
-                                        홍*동 <span className="txtStyle06-C777W500">보호자</span>
+                                            홍*동 <span className="txtStyle06-C777W500">보호자</span>
                                         </h3>
                                         <time className="txtStyle06-C777">1분전</time>
                                     </div>
@@ -308,15 +366,15 @@ console.log("12")
                                     <div className="mainRev__link--txt">
                                         <span className="txtStyle06-C333">김*자 케어메이트에게</span>
                                         <p className="txtStyle04-C333">
-                                        엄마가 너무 마음 편해 하셨어요. 감사 다 다음에도 이용할게요. 엄마가 너무 마음
-                                        편해 하셨어요. 감사 다 다음에도 이용할게요. 엄마가
+                                            엄마가 너무 마음 편해 하셨어요. 감사 다 다음에도 이용할게요. 엄마가 너무 마음
+                                            편해 하셨어요. 감사 다 다음에도 이용할게요. 엄마가
                                         </p>
                                     </div>
                                 </a>
                                 <a href="">
                                     <div className="mainRev__link--tit">
                                         <h3 className="txtStyle05-Wbold">
-                                        홍*동 <span className="txtStyle06-C777W500">보호자</span>
+                                            홍*동 <span className="txtStyle06-C777W500">보호자</span>
                                         </h3>
                                         <time className="txtStyle06-C777">1분전</time>
                                     </div>
@@ -332,7 +390,7 @@ console.log("12")
                                 <a href="">
                                     <div className="mainRev__link--tit">
                                         <h3 className="txtStyle05-Wbold">
-                                        홍*동 <span className="txtStyle06-C777W500">보호자</span>
+                                            홍*동 <span className="txtStyle06-C777W500">보호자</span>
                                         </h3>
                                         <time className="txtStyle06-C777">1분전</time>
                                     </div>
@@ -403,8 +461,8 @@ console.log("12")
                                 <div className="mainItemWrap__info--item">
                                     <a href="" className="pink">
                                         <h3 className="txtStyle02">
-                                        케어메이트와 따로<br />
-                                        직거래하면 안되나요?
+                                            케어메이트와 따로<br />
+                                            직거래하면 안되나요?
                                         </h3>
                                         <p className="txtStyle05-C555">정답 확인해보세요!</p>
                                     </a>
@@ -412,8 +470,8 @@ console.log("12")
                                 <div className="mainItemWrap__info--item">
                                     <a href="" className="purple">
                                         <h3 className="txtStyle02">
-                                        간병인 구하기 전 <br />
-                                        필수로 확인해야할 이것은?
+                                            간병인 구하기 전 <br />
+                                            필수로 확인해야할 이것은?
                                         </h3>
                                         <p className="txtStyle05-C555">보호자 아보카도님의 사연 보기</p>
                                     </a>
@@ -438,69 +496,71 @@ console.log("12")
                     </section>
                 </div>
             </main>
-        {/* <!-- // 본문 끝 --> */}
+            {/* <!-- // 본문 끝 --> */}
 
-        {/* <!-- 푸터 --> */}
-        <footer>
-            {/* <!-- 
+            {/* <!-- 푸터 --> */}
+            <footer>
+                {/* <!-- 
             app : mainBtn__bottom
             모바일 : mainBtn__bottom mobile
             --> */}
-            <section className="mainBtn__bottom">
-                <button type="button">간병 서비스 신청하기</button>
-            </section>
-            <section>
-                <h2 className="a11y-hidden">회사 법적 이슈 관련한 링크</h2>
-                <ul className="footer__link">
-                    <li><a href="">사업자 정보 확인</a></li>
-                    <li><a href="">이용약관</a></li>
-                    <li><a href="">개인정보처리방침</a></li>
-                </ul>
-                <p className="txtStyle06-C777">
-                    주식회사 에이치엠씨 네트웍스는 통신판매중개자로서 거래에 필요한 시스템을 운영 및
-                    제공합니다. 보호자와 케어메이트 사이에 발생 분쟁에 대한 책임은 보호자와 케어메이트에게
-                    있습니다.
-                </p>
-            </section>
-            {/* <!-- h2 클릭시 footer__company에 active 추가 --> */}
-            <section className="footer__company active">
-                <h2 className="txtStyle06-C555Wnoml">주식회사 에이치엠씨 네트웍스 사업자 정보</h2>
-                <dl className="footer__company--open">
-                    <dt>서비스명</dt>
+                <section className="mainBtn__bottom">
+                    <button type="button">간병 서비스 신청하기</button>
+                </section>
+                <section>
+                    <h2 className="a11y-hidden">회사 법적 이슈 관련한 링크</h2>
+                    <ul className="footer__link">
+                        <li><a href="">사업자 정보 확인</a></li>
+                        <li><a href="">이용약관</a></li>
+                        <li><a href="">개인정보처리방침</a></li>
+                    </ul>
+                    <p className="txtStyle06-C777">
+                        주식회사 에이치엠씨 네트웍스는 통신판매중개자로서 거래에 필요한 시스템을 운영 및
+                        제공합니다. 보호자와 케어메이트 사이에 발생 분쟁에 대한 책임은 보호자와 케어메이트에게
+                        있습니다.
+                    </p>
+                </section>
+                {/* <!-- h2 클릭시 footer__company에 active 추가 --> */}
+                <section className="footer__company active">
+
+                    <h2 className="txtStyle06-C555Wnoml">주식회사 에이치엠씨 네트웍스 사업자 정보</h2>
+                    <dl className="footer__company--open">
+                        <dt>서비스명</dt>
                         <dd>케어네이션</dd>
                         <dt>서비스 주소지</dt>
                         <dd>서울 강남구 테헤란로8길 37 한동빌딩 5층</dd>
-                    <dt>회사명</dt>
+                        <dt>회사명</dt>
                         <dd>주식회사 에이치엠씨네트웍스</dd>
                         <dt>사업장 주소지</dt>
                         <dd>충청남도 천안시 동남구 삼룡1길 50</dd>
-                    <dt>사업자등록번호</dt>
+                        <dt>사업자등록번호</dt>
                         <dd>212-86-05451</dd>
-                    <dt>대표자명</dt>
+                        <dt>대표자명</dt>
                         <dd>김견원</dd>
-                    <dt>개인정보관리책임자</dt>
+                        <dt>개인정보관리책임자</dt>
                         <dd>서대건</dd>
-                    <dt>통신판매업신고</dt>
+                        <dt>통신판매업신고</dt>
                         <dd>2019-경기광주-1399호</dd>
-                    <dt>이메일</dt>
+                        <dt>이메일</dt>
                         <dd>help@carenation.kr</dd>
-                    <dt>고객센터 전화번호</dt>
+                        <dt>고객센터 전화번호</dt>
                         <dd>1811-5949</dd>
-                    <dt>
-                    고객센터, <br />
-                    카카오톡 운영 시간
-                    </dt>
+                        <dt>
+                            고객센터, <br />
+                            카카오톡 운영 시간
+                        </dt>
                         <dd>
-                        월 ~ 목요일(오전 10시 ~ 오후 5시 30) <br />
-                        금요일(오전 10시 ~ 오후 5시)<br />
-                        법정공휴일 휴무
+                            월 ~ 목요일(오전 10시 ~ 오후 5시 30) <br />
+                            금요일(오전 10시 ~ 오후 5시)<br />
+                            법정공휴일 휴무
                         </dd>
-                    <dt>호스팅 사업자</dt>
+                        <dt>호스팅 사업자</dt>
                         <dd>Amazon Web Services(AWS)</dd>
-                </dl>
-            </section>
-        </footer>
-        <MainNavigator />
+                    </dl>
+                </section>
+            </footer>
+
+            <MainNavigator />
         </>
     )
 }
