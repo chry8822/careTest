@@ -1,5 +1,5 @@
 import React,{ useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import { useHref, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { showPopup, hidePopup } from '../../redux/actions/popup/popup';
 import Popup from "../common/popup";
@@ -636,29 +636,29 @@ console.log("job",mainData.jobs)
                             </div>
                             <div className="mainItemWrap__info">
                                 <div className="mainItemWrap__info--item">
-                                    <a href="" className="pink">
+                                    <a onClick={() => window.open('https://ci_protector.app.carenation.kr/guide/trade-info', '_blank')} className="pink">
                                         <h3 className="txtStyle02">
                                             케어메이트와 따로<br />
                                             직거래하면 안되나요?
                                         </h3>
                                         <p className="txtStyle05-C555">정답 확인해보세요!</p>
-                                    </a>
+                                    </a >
                                 </div>
                                 <div className="mainItemWrap__info--item">
-                                    <a href="" className="purple">
+                                    <a onClick={() => window.open('https://ci_protector.app.carenation.kr/guide/insurance', '_blank')} className="purple">
                                         <h3 className="txtStyle02">
                                             간병인 구하기 전 <br />
                                             필수로 확인해야할 이것은?
                                         </h3>
                                         <p className="txtStyle05-C555">보호자 아보카도님의 사연 보기</p>
-                                    </a>
+                                    </a >
                                 </div>
                                 <div className="todayEnt">
-                                    <a href="">
+                                    <a onClick={() => window.open('https://ci_protector.app.carenation.kr/community/carenatoon', '_blank')}>
                                         <p className="txtStyle04-W500">환자와 간병인의 이야기</p>
                                         <h3 className="txtStyle02">케어네이툰</h3>
                                         <span className="txtStyle05-C555W500">보러가기</span>
-                                    </a>
+                                    </a >
                                 </div>
                             </div>
                             <div className="mainItemWrap__comu">
