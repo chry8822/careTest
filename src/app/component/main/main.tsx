@@ -1,15 +1,24 @@
-import React,{ useEffect, useState, useCallback , useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React,{ useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { useHref, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { hidePopup } from '../../redux/actions/popup/popup';
+import { showPopup, hidePopup } from '../../redux/actions/popup/popup';
+import Popup from "../common/popup";
 import MainNavigator from './navigator/navigator'
 import Header from '../common/header';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Autoplay } from "swiper";
-import 'swiper/css';
-import "swiper/css/navigation";
 import { MemoPiechart } from '../common/chart'
 import Api from '../../api/api'
+import { CountUp } from './../common/countUp';
+import * as Utils from '../../constants/utils'
+import moment from 'moment'
+import Slider from "react-slick";
+
+import { Swiper, SwiperSlide } from "swiper/react";
+import SwiperCore, { Pagination, Autoplay } from "swiper";
+import 'swiper/swiper-bundle.min.css'
+import 'swiper/swiper.min.css'
+
+SwiperCore.use([Pagination, Autoplay]);
+
 type mainStateType = {
         jobs: any[];
         applicantList: any[];
@@ -36,11 +45,15 @@ type mainStateType = {
 
 
 const Main = () => {
+
+   
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const [ mainBannerPosition, setMainBannerPosition ] = useState(1)
-    const [ mainData, setMainData ] = useState<mainStateType>({
+    const [ mainBannerPosition, setMainBannerPosition ] = useState(1) //## 메인 배너 포지션
+    const [ countUpCheck, setCountUpCheck ] = useState<boolean>(false) // ## 누적 데이터 카운트업 시작 체크
+    const [ mainData, setMainData ] = useState<mainStateType>({ //## 메인 데이터
         jobs: [],
         applicantList: [],        
         lowestPriceJobList: [],   
@@ -65,12 +78,15 @@ const Main = () => {
     }
 )
 
+// const graphData = {
+//     ...mainData.pieChartData
+// }
+
+console.log("job",mainData.jobs)
+
     useEffect(() => {
         mainListApi()
     },[])
-
-
-
 
     const mainListApi = () => {
         Api.mainList().then((response: any) => {
@@ -89,11 +105,11 @@ const Main = () => {
                             accumulatedAmount: data.data.use_list.accumulated_amount
                         };
                     }
-                    let job: any = {
+                    let jobj: any = {
                         ...mainData,
                         jobs: data.data.jobs,
                         applicantList: data.data.applicant,
-                        lowestPriceJobList: [],
+                        lowestPriceJobList: Utils.isAuthCheck() ? [] : mainData.lowestPriceJobList,
                         careUseList: tempCareUseList,
                         patientsCnt: data.data.patients_cnt,
                         userRate: {
@@ -103,23 +119,60 @@ const Main = () => {
                             womanRate: parseFloat(Number(data.data.user_rate.woman_rate).toFixed(1)),
                             cgsUsersTotal: Number(data.data.user_rate.cgs_users_total)
                         },
-                        pieChartData: [{
+                        pieChartData: {
                             data: [parseFloat(Number(data.data.user_rate.local_rate).toFixed(1)), parseFloat(Number(data.data.user_rate.foreigner_rate).toFixed(1))],
                             backgroundColor: ["#bc8877", "#e8bdaf"],
                             borderWidth: 0
-                        }],
+                        },
                         mainReviewList: data.data.rating
                     }
-                    setMainData(job)
+                    setMainData(jobj)
+                    // if(!Utils.isAuthCheck()) {
+                        lowestPriceJobListApi(jobj);
+                    // }
                 }
             }
         }).catch(err => {
             console.log(err)
+            dispatch(showPopup({element:Popup, action:popupAction}));
         })
-        
     }
 
 
+    console.log(mainData.jobs)
+    /**
+     * 최저가 현황 리스트 Api
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+    const lowestPriceJobListApi = (mainData: any) => {
+        try {
+            Api.lowestPriceList().then((response:any) => {
+                if(response.status === 200) {
+                    let data = response.data;
+                    if (data.code === 200) {
+                        setMainData({
+                            ...mainData,
+                            lowestPriceJobList: data.data
+                        })
+                    } else {
+                        dispatch(showPopup({element:Popup,content:data.massage}))
+                    }
+                } else {
+                    dispatch(showPopup({element:Popup}))
+                }
+            }).catch(err => {
+                console.log(err);
+                dispatch(showPopup({element:Popup}))
+            });
+        } catch(e) {
+            console.log(e);
+            dispatch(showPopup({element:Popup}))
+        }
+    }
+
+
+ 
+ 
     // 메인 배인 렌더링
     const renderMainbanner = () => {
         return (
@@ -128,11 +181,10 @@ const Main = () => {
                 slidesPerView={1}
                 className="mySwiper"
                 loop={true}
-                modules={[Autoplay]}
+                autoplay={{ delay: 2500 }}
                 onSlideChange={(e)=> {
                     setMainBannerPosition(e.realIndex + 1)
                 }}
-                autoplay={{delay:1000}}
                 allowTouchMove={true}
             >
                 <SwiperSlide>
@@ -164,11 +216,161 @@ const Main = () => {
         )
     } 
 
+    // 보호자 후기 렌더링 (swiper 라이브러리는 vertical 시 자동으로 높이를 가지고 있는데 커스텀 안되서 react-slick 사용)
+
+    const renderReview = () =>  {
+        let settings = {
+            infinite: true,
+            autoplaySpeed: 1000,
+            slidesToShow: 5,
+            slidesToScroll: 1,
+            autoplay: true,
+            vertical: true,
+            arrows: false,
+            touchMove: false
+        };
+        return (
+            <Slider {...settings}>
+                {reviewList}
+            </Slider>
+        )
+    }
+     
+    
+    const reviewList = useMemo(() => {
+
+        let listData :any[] = [];
+        console.log("listData",listData)
+        if (Utils.isEmpty(mainData.mainReviewList) || mainData.mainReviewList.length === 0) {
+            return listData;
+        }
+        
+        mainData.mainReviewList.forEach((item:any, index:any) => {
+            listData.push(
+                        <a href="" key={index}>
+                            <div className="mainRev__link--tit">
+                                {
+                                    Utils.isEmpty(item.prt_user) ?
+                                        <h3 className="txtStyle05-Wbold"><span className="txtStyle06-C777W500">탈퇴한 보호자</span></h3>
+                                        :
+                                        <h3 className="txtStyle05-Wbold">{item.prt_user.name}<span className="txtStyle06-C777W500">보호자</span></h3>
+                                }
+                                <time className="txtStyle06-C777">{(item.created_at)}</time>
+                            </div>
+                            <figure className="ratingGroup">
+                                <img src="../images/reviewStar03.svg" alt="종합평점" />
+                                <figcaption className="txtStyle05">{item.rating.toFixed(1)}</figcaption>
+                            </figure>
+                            <div className="mainRev__link--txt">
+                                <span className="txtStyle06-C333">{Utils.isEmpty(item.cgs_user) ? "탈퇴한 케어메이트에게" : item.cgs_user.name + " 케어메이트에게"}</span>
+                                <p className="txtStyle04-C333">{item.content}</p>
+                            </div>
+                        </a>
+            ) 
+        });
+        return listData;
+    },[mainData.mainReviewList]);
+
+
+
+      /**
+     * 보호자님이 남긴 후기 작성 시간 계산
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+       const formatSubmitDate = (createdAt: string) => {
+        const curDate = moment();
+        const diffSecond = curDate.diff(moment(createdAt), 'seconds');
+
+        if (diffSecond < 60) {
+            return diffSecond + "초 전";
+        } else if (diffSecond < 60 * 60) {
+            return Math.floor(moment.duration(curDate.diff(moment(createdAt))).asMinutes()) + "분 전";
+        } else if (diffSecond < 60 * 60 * 24) {
+            return Math.floor(moment.duration(curDate.diff(moment(createdAt))).asHours()) + "시간 전";
+        } else {
+            return Math.floor(moment.duration(curDate.diff(moment(createdAt).format("YYYY-MM-DD"))).asDays()) + "일 전";
+        }
+    };
+
+
+      /**
+     * 케어네이션 이용 현황 카운트 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+       const renderUsageCount = useMemo(() => {
+        let html: any[] = [];
+        html.push(
+            <React.Fragment key={Math.random()}>
+                  <dl className="mainItemWrap__history--list">
+                    <div>
+                        <dt>누적 이용 건수</dt>
+                        <dd><CountUp totalNumber={mainData.careUseList.jobCnt} countUpCheck={countUpCheck}/></dd>
+                    </div>
+                    <div>
+                        <dt><span><CountUp totalNumber={mainData.careUseList.jobCareTimeYear} countUpCheck={countUpCheck}/></span></dt>
+                        <dd>누적 간병시간</dd>
+                    </div>
+                </dl>
+                <div className="mainItemWrap__history--acc">
+                    <h3 className="txtStyle04-C333Wnoml">누적 승인 금액</h3>
+                    <p className="txtStyle03-Bold"><CountUp totalNumber={mainData.careUseList.accumulatedAmount} countUpCheck={countUpCheck}/></p>
+                </div>
+            </React.Fragment>
+        );
+        return html;
+    }, [mainData.careUseList, countUpCheck]);
 
 
 
 
 
+    //옵저버
+
+    const observerRef = useRef(null);
+
+    useEffect(() => {
+       if(!countUpCheck) {
+           window.scrollTo (0,0)
+       }
+        if (observerRef.current) {
+        console.log("등록")
+          let options = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0
+          }
+          
+          const observer = new IntersectionObserver(callback, options);
+          observer.observe(observerRef.current)  
+        }
+      }, [observerRef.current])
+
+      const callback = useCallback((entries: any, observer: any) => { 
+        entries.forEach((entry: any) => {
+          if (entry.intersectionRatio) {
+              observer.unobserve(observerRef.current); 
+              console.log("셋팅")
+              console.log("해제")
+            setCountUpCheck(true)
+          }
+        });
+      }, [mainData.careUseList,countUpCheck])
+
+
+
+          /**
+     * Scroll Listener
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+    // const scrollListener = useCallback(() => {
+    //     const scrollTop = document.documentElement.scrollTop; //## 이미 스크롤되어서 보이지 않는 구간의 높이
+    //     const clientHeight = document.documentElement.clientHeight; //## 사용자에게 보여지는 페이지의 높이
+
+    //     //## 케어네이션 이용 현황 스크롤 위치에 닿으면 number scrolling 처리
+    //     if (observerRef.current && observerRef.current?.offsetTop + ((observerRef.current?.offsetHeight) - 70) < (scrollTop + clientHeight)) {
+    //         countUpCheck(true);
+    //     }
+    // }, []);
 
 
 
@@ -195,6 +397,7 @@ const Main = () => {
     //##
     //##################################################################################################################
 
+
     return (
         <>
             <Header
@@ -219,9 +422,9 @@ const Main = () => {
                                     </div>
                                     <div className="mainJobList__none">
                                         <img src="../images/noneMainList.svg" alt="" />
-                                        {/* <p className="txtStyle04-W500">{mainData.userRate.localRate}</p> */}
+                                        <p className="txtStyle04-W500">등록하신 공고가 없습니다.</p>
                                     </div>
-                                    <ul className="Job__list">
+                                    {/* <ul className="Job__list">
                                         <li>
                                             <a href="">
                                                 <img
@@ -245,7 +448,7 @@ const Main = () => {
                                                 </dl>
                                             </a>
                                         </li>
-                                    </ul>
+                                    </ul> */}
                                 </div>
                                 <div className="mainJobList">
                                     <div className="Job__tit">
@@ -319,24 +522,26 @@ const Main = () => {
                                     <h3 className="txtStyle03">케어네이션 케어메이트 현황</h3>
                                     <dl>
                                         <dt className="txtStyle04-C333">가입 케어메이트</dt>
-                                        <dd className="txtStyle03-Bold">000,000명</dd>
+                                        <dd className="txtStyle03-Bold">{mainData.userRate.cgsUsersTotal}명</dd>
                                     </dl>
+
+
                                     <div className="mainChart">
                                         <div className="mainChart__pie">
                                             {/* 차트 넣는 자리 */}
                                             <div style={{padding:"16px 0 20px", margin:"16px 0 20px"}}>
-                                                <MemoPiechart graph={mainData.pieChartData}/>
+                                                {/* <MemoPiechart graph={mainData.pieChartData}/> */}
                                             </div>
                                         </div>
                                         <div className="mainChart__legend">
                                             <dl>
                                                 <div>
                                                     <dt>내국인</dt>
-                                                    <dd>80.1</dd>
+                                                    <dd>{mainData.userRate.localRate}</dd>
                                                 </div>
                                                 <div>
                                                     <dt>외국인</dt>
-                                                    <dd>20.2</dd>
+                                                    <dd>{mainData.userRate.foreignerRate}</dd>
                                                 </div>
                                             </dl>
                                         </div>
@@ -345,124 +550,34 @@ const Main = () => {
                                                 <div style={{ width: "41%" }}></div>
                                             </div>
                                             <div className="mainChart__line--detail">
-                                                <p>여성 : <span>41.2</span></p>
-                                                <p>남성 : <span>59.1</span></p>
+                                                <p>여성 : <span>{mainData.userRate.womanRate}</span></p>
+                                                <p>남성 : <span>{mainData.userRate.manRate}</span></p>
                                             </div>
                                         </div>
                                     </div>
                                     <p className="txtStyle06-C777">* 인증 케어메이트 기준</p>
                                 </article>
-                                <dl className="mainItemWrap__history--list">
-                                    <div>
-                                        <dt>18,265</dt>
-                                        <dd>누적 이용 건수</dd>
-                                    </div>
-                                    <div>
-                                        <dt><span>19</span><span>000</span></dt>
-                                        <dd>누적 간병시간</dd>
-                                    </div>
-                                </dl>
-                                <div className="mainItemWrap__history--acc">
-                                    <h3 className="txtStyle04-C333Wnoml">누적 승인 금액</h3>
-                                    <p className="txtStyle03-Bold">5,104,291,700</p>
-                                </div>
+                                    {renderUsageCount}
                             </div>
                         </article>
-
-
-
-
                         <article className="mainRev breakLine">
                             <div className="mainRev__Tit">
-                                <h2 className="txtStyle02">보호자님이 남긴 후기</h2>
+                                <h2 className="txtStyle02"
+                                   ref={observerRef}
+                                >보호자님이 남긴 후기</h2>
                                 <a href="">전체보기</a>
                             </div>
-                            <div className="mainRev__link">
-                                <a href="">
-                                    <div className="mainRev__link--tit">
-                                        <h3 className="txtStyle05-Wbold">
-                                            홍*동 <span className="txtStyle06-C777W500">보호자</span>
-                                        </h3>
-                                        <time className="txtStyle06-C777">1분전</time>
-                                    </div>
-                                    <figure className="ratingGroup">
-                                        <img src="../images/reviewStar03.svg" alt="종합평점" />
-                                        <figcaption className="txtStyle05">4.2</figcaption>
-                                    </figure>
-                                    <div className="mainRev__link--txt">
-                                        <span className="txtStyle06-C333">김*자 케어메이트에게</span>
-                                        <p className="txtStyle04-C333">엄마가 너무 마음 편해 하셨어요.</p>
-                                    </div>
-                                </a>
-                                <a href="">
-                                    <div className="mainRev__link--tit">
-                                        <h3 className="txtStyle05-Wbold">
-                                            홍*동 <span className="txtStyle06-C777W500">보호자</span>
-                                        </h3>
-                                        <time className="txtStyle06-C777">1분전</time>
-                                    </div>
-                                    <figure className="ratingGroup">
-                                        <img src="../images/reviewStar03.svg" alt="종합평점" />
-                                        <figcaption className="txtStyle05">4.2</figcaption>
-                                    </figure>
-                                    <div className="mainRev__link--txt">
-                                        <span className="txtStyle06-C333">김*자 케어메이트에게</span>
-                                        <p className="txtStyle04-C333">.</p>
-                                    </div>
-                                </a>
-                                <a href="">
-                                    <div className="mainRev__link--tit">
-                                        <h3 className="txtStyle05-Wbold">
-                                            홍*동 <span className="txtStyle06-C777W500">보호자</span>
-                                        </h3>
-                                        <time className="txtStyle06-C777">1분전</time>
-                                    </div>
-                                    <figure className="ratingGroup">
-                                        <img src="../images/reviewStar03.svg" alt="종합평점" />
-                                        <figcaption className="txtStyle05">4.2</figcaption>
-                                    </figure>
-                                    <div className="mainRev__link--txt">
-                                        <span className="txtStyle06-C333">김*자 케어메이트에게</span>
-                                        <p className="txtStyle04-C333">
-                                            엄마가 너무 마음 편해 하셨어요. 감사 다 다음에도 이용할게요. 엄마가 너무 마음
-                                            편해 하셨어요. 감사 다 다음에도 이용할게요. 엄마가
-                                        </p>
-                                    </div>
-                                </a>
-                                <a href="">
-                                    <div className="mainRev__link--tit">
-                                        <h3 className="txtStyle05-Wbold">
-                                            홍*동 <span className="txtStyle06-C777W500">보호자</span>
-                                        </h3>
-                                        <time className="txtStyle06-C777">1분전</time>
-                                    </div>
-                                    <figure className="ratingGroup">
-                                        <img src="../images/reviewStar03.svg" alt="종합평점" />
-                                        <figcaption className="txtStyle05">4.2</figcaption>
-                                    </figure>
-                                    <div className="mainRev__link--txt">
-                                        <span className="txtStyle06-C333">김*자 케어메이트에게</span>
-                                        <p className="txtStyle04-C333">좋아요</p>
-                                    </div>
-                                </a>
-                                <a href="">
-                                    <div className="mainRev__link--tit">
-                                        <h3 className="txtStyle05-Wbold">
-                                            홍*동 <span className="txtStyle06-C777W500">보호자</span>
-                                        </h3>
-                                        <time className="txtStyle06-C777">1분전</time>
-                                    </div>
-                                    <figure className="ratingGroup">
-                                        <img src="../images/reviewStar03.svg" alt="종합평점" />
-                                        <figcaption className="txtStyle05">4.2</figcaption>
-                                    </figure>
-                                    <div className="mainRev__link--txt">
-                                        <span className="txtStyle06-C333">김*자 케어메이트에게</span>
-                                        <p className="txtStyle04-C333">별로</p>
-                                    </div>
-                                </a>
+
+                            {/* 보호자 후기 데이터 붙이고 map으로 렌더링 */}
+                            <div className="mainRev__link" style={{overflow:"hidden"}}>
+                              {/* <div className="mainRev__link"> */}
+                              {renderReview()}
                             </div>
                         </article>
+
+
+                        {/* 실시간 공고 현황 데이터 붙이고 map 렌더링 */}
+
                         <article className="mainNews breakLine">
                             <div className="mainItemWrap__tit">
                                 <h2 className="txtStyle02">실시간 케어메이트 소식 <span className="live">실시간</span></h2>
@@ -511,6 +626,10 @@ const Main = () => {
                                 </article>
                             </div>
                         </article>
+
+
+
+                        {/* 간병정보 링크 연결*/}
                         <article>
                             <div className="mainItemWrap__tit">
                                 <h2 className="txtStyle02">케어네이션 간병정보</h2>
@@ -554,9 +673,10 @@ const Main = () => {
                     </section>
                 </div>
             </main>
-            {/* <!-- // 본문 끝 --> */}
 
-            {/* <!-- 푸터 --> */}
+
+
+            {/* <!-- 푸터  링크 연결  간병 서비스 신청 버튼 연결 , 사업자 정보 토글설정 --> */}
             <footer>
                 {/* <!-- 
             app : mainBtn__bottom

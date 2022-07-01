@@ -1,55 +1,26 @@
-// export function mainList() {
-//     return new Promise((resolve, reject) => {
-//             return baseApi(apiCarePrefix).get(Constants.MAIN_API, getAccessTokenHeader())
-//                 .then((response) => {
-//                     successStatusCheck(response, resolve)
-//                 }).catch(err => {
-//                     failStatusCheck(err, reject)
-//                 });
-//         }
-//     )
-// }
-
 import axios from 'axios';
+import * as LocalStorage from '../constants/localStorage'
 
-function getAccessTokenHeader() {
-    let auth = localStorage.getItem(localStorage.TOKEN_TYPE) + ` ` + localStorage.getItem(localStorage.ACCESS_TOKEN);
-    return {'Authorization': auth}
-}
-// https://ci_api3.carenation.kr
-// const apiBasePrefix = process.env.REACT_APP_BASE_URL;
 const apiBasePrefix = "https://ci_api3.carenation.kr"
-const apiPrefix = process.env.REACT_APP_API_URL;
+const apiPrefix = "/v3_0"
 const apiCarePrefix = "/v3_0/protector";
 const apiCommonPrefix = process.env.REACT_APP_COMMON_API_URL;
 const apiCaregiverPrefix = `${apiBasePrefix}/v2/caregiver`;
-
-console.log("url", apiBasePrefix)
-
 const MAIN_API = "/main";
-
-const baseApi = (apiUrl:string = "") => {
-    const axiosBase =  axios.defaults.baseURL = apiBasePrefix + apiUrl
-    return axiosBase;
-} 
+const LOWEST_PRICE_API = "/job/main";
 
 
-export function mainList () {
-return new Promise ((resolve, reject) => {
-        axios({
-            method: "get",
-            url: baseApi(apiCarePrefix) + MAIN_API,
-            headers : getAccessTokenHeader() 
-        })
-        .then((response) => {
-            successStatusCheck(response,resolve)
-        }).catch((err) => {
-            console.log(err, reject)
-        })
-})
+function getAccessTokenHeader() {
+    let auth = LocalStorage.getStorage(LocalStorage.AUTHORIZATION);
+    if(auth) {
+        return {
+                'Authorization': auth
+        }
+    } else {
+        return
+    }
+    
 }
-
-
 
 function successStatusCheck(response: any, resolve: any) {
     let hkey: string = response.headers['hkey'];
@@ -77,4 +48,49 @@ function successStatusCheck(response: any, resolve: any) {
 }
 
 
-export default {mainList} 
+const baseApi = (apiUrl:string = "") => {
+    const axiosBase =  axios.defaults.baseURL = apiBasePrefix + apiUrl
+    return axiosBase;
+}     
+
+export function mainList () {
+    return new Promise ((resolve, reject) => {
+            axios({
+                method: "get",
+                url: baseApi(apiCarePrefix) + MAIN_API,
+                headers : getAccessTokenHeader()
+            })    
+            .then((response) => {
+                successStatusCheck(response,resolve)
+            }).catch((err) => {
+                console.log(err, reject)
+            })    
+    })        
+}
+
+
+export function lowestPriceList () {
+    return new Promise ((resolve, reject) => {
+            axios({
+                method: "get",
+                url: baseApi(apiPrefix) + "/protector"  + LOWEST_PRICE_API,
+                headers : getAccessTokenHeader()
+            })    
+            .then((response) => {
+                successStatusCheck(response,resolve)
+            }).catch((err) => {
+                console.log(err, reject)
+            })    
+    })        
+}
+
+
+
+
+
+
+
+
+
+
+export default {mainList,lowestPriceList } 

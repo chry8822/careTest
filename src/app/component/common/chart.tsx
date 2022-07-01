@@ -1,14 +1,42 @@
 import * as React from 'react';
 import { ResponsivePie } from '@nivo/pie';
 
-interface PieChartProps{
-    graph: any[];
+interface GraphType {
+    data:[]|any;
+    backgroundColor:[]|any;
+    borderWidth:any;
 }
 
+interface PieChartProps{
+    graph: GraphType;
+}
+
+
 // const Piechart = () => {
-const Piechart = ({graph}: PieChartProps) => {
-//    const data = graph.map((item) => )
-//    console.log(data)
+const Piechart = ({graph}:PieChartProps) => {
+    const { data, backgroundColor, borderWidth } = graph
+    const [ localRate, otherRate ] = data
+    const [ localColor, otherColor]  = backgroundColor
+    console.log(graph)
+
+const chartData = [
+    {
+        "id": "내국인",
+        // "value": data[0],
+        // "color": backgroundColor[0],
+        "value": localRate,
+        "color": localColor
+    },
+    {
+        "id": "외국인",
+            // "value": data[0],
+        // "color": backgroundColor[0],
+        "value": otherRate,
+        "color": otherColor
+    },
+]
+
+
     return (
         // chart height가 100%이기 때문이 chart를 덮는 마크업 요소에 height 설정
             <div style={{width: "126px", height: "126px"}}>
@@ -19,20 +47,7 @@ const Piechart = ({graph}: PieChartProps) => {
                     /**
                      * chart에 사용될 데이터
                      */
-                    data={[
-                        {
-                            id: "내국인",
-                            // value: 90,
-                            // value: graph
-                            color: "#bc8877" 
-                        },
-                        {
-                            id: "외국인",
-                            value: 10,
-                            // value: graph.data[1]
-                            color: "#e8bdaf" 
-                        },
-                    ]}
+                    data ={chartData}
                     /**
                      * chart margin
                      */
@@ -52,9 +67,7 @@ const Piechart = ({graph}: PieChartProps) => {
                     /**
                      * chart 색상
                      */
-                    colors={['#bc8877', '#e8bdaf']}
-                    // colors={[ graph.backgroundColor[0], graph.backgroundColor[1]]}
-                    // colors={{ scheme: 'nivo' }} // nivo에서 제공해주는 색상 조합 사용할 때
+                    colors={[localColor,otherColor]} // nivo에서 제공해주는 색상 조합 사용할 때
                     /**
                      * pad border 두께 설정
                      */
