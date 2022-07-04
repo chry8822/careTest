@@ -22,15 +22,15 @@ const Popup = () => {
                 <h2 className="txtStyle03">{Utils.isEmpty(popup.title) ? "알림" : popup.title}</h2>
                 <p dangerouslySetInnerHTML={{__html: Utils.isEmpty(popup.content) ? DEFAULT_MSG : popup.content}}/>
             </div>
-            <div className="buttonWrap">
+            <div className="btnWrap">
                 {
                     popup.btnType === 'two' &&
-                    <button type="button" className="outlineTxtBtn"
+                    <button type="button" className="btnBorder"
                             onClick={() => popup.action("hide")}>
                         {Utils.isEmpty(popup.btn01) ? "취소" : popup.btn01}
                     </button>
                 }
-                <button type="button" className="solidBtn"
+                <button type="button" className="btnColor"
                         onClick={() => popup.action(popup.actionType)}>
                     {Utils.isEmpty(popup.btn02) ? "확인" : popup.btn02}
                 </button>

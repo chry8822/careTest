@@ -1,49 +1,58 @@
-import * as React from 'react';
+import React,{ useEffect, useState } from 'react';
 import { ResponsivePie } from '@nivo/pie';
 
-interface GraphType {
-    data:[]|any;
-    backgroundColor:[]|any;
-    borderWidth:any;
-}
 
 interface PieChartProps{
-    graph: GraphType;
+    graph: any;
 }
 
 
 // const Piechart = () => {
 const Piechart = ({graph}:PieChartProps) => {
-    const { data, backgroundColor, borderWidth } = graph
-    const [ localRate, otherRate ] = data
-    const [ localColor, otherColor]  = backgroundColor
-    console.log(graph)
+    const [ graphData, setGraphData ] = useState<any>({
+        data: "",
+        backgroundColor: ""
+    })
 
-const chartData = [
-    {
-        "id": "내국인",
-        // "value": data[0],
-        // "color": backgroundColor[0],
-        "value": localRate,
-        "color": localColor
-    },
-    {
-        "id": "외국인",
-            // "value": data[0],
-        // "color": backgroundColor[0],
-        "value": otherRate,
-        "color": otherColor
-    },
-]
+
+    useEffect(() => {
+        if(graph.data !== undefined) {
+            const { data, backgroundColor } = graph
+             setGraphData({
+                ...graphData,
+                data: data,
+                backgroundColor: backgroundColor
+             })
+        }        
+    },[graph.data,graph.backgroundColor])
+
+  
+    console.log(graphData.backgroundColor[0])
+
+    const chartData = [
+        {
+            "id": "내국인",
+            "value": graphData.data[0],
+            "color": graphData.backgroundColor[0],
+        },
+        {
+            "id": "외국인",
+            "value": graphData.data[1],
+            "color": graphData.backgroundColor[1],
+        },
+    ]
 
 
     return (
         // chart height가 100%이기 때문이 chart를 덮는 마크업 요소에 height 설정
-            <div style={{width: "126px", height: "126px"}}>
+            <div style={{width: "124px", height: "124px"}}>
                 <ResponsivePie
                     animate={false}
                     enableArcLabels={false}
                     enableArcLinkLabels={false}
+                    colors={{ datum: 'data.color' }}
+                    //  data 에 명시한 컬러를 사용할때 datum : data.color 로 설정시 데이터 안에 color 순서대로 출력 
+
                     /**
                      * chart에 사용될 데이터
                      */
@@ -67,7 +76,6 @@ const chartData = [
                     /**
                      * chart 색상
                      */
-                    colors={[localColor,otherColor]} // nivo에서 제공해주는 색상 조합 사용할 때
                     /**
                      * pad border 두께 설정
                      */

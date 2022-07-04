@@ -7,8 +7,9 @@ import { PersistGate } from "redux-persist/integration/react";
 import {
     Login,
     Main,
+    CareExtend
 } from "./component";
-
+import Popup from './container/popup/popup';
 
 const persistor = persistStore(store);
 
@@ -20,8 +21,13 @@ const Root: React.FC  = ()=> {
                     <BrowserRouter>
                       <Routes>
                         <Route path="/" element={<Main/>}/>
+                        <Route path="care">
+                            <Route path="login" element={<Login/>}/>
+                            <Route path="new/extend" element={<CareExtend/>} />
+                        </Route>
                       </Routes>
                     </BrowserRouter>
+                    <Popup/>
                 </PersistGate>
             </Provider>
         </>

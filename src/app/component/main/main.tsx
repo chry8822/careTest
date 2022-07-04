@@ -11,13 +11,20 @@ import { CountUp } from './../common/countUp';
 import * as Utils from '../../constants/utils'
 import moment from 'moment'
 import Slider from "react-slick";
+import "slick-carousel/slick/slick.css"
+import "slick-carousel/slick/slick-theme.css"
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore, { Pagination, Autoplay } from "swiper";
 import 'swiper/swiper-bundle.min.css'
 import 'swiper/swiper.min.css'
 
+const SERVER_TYPE = process.env.REACT_APP_SERVER_TYPE;
+
+
 SwiperCore.use([Pagination, Autoplay]);
+
+
 
 type mainStateType = {
         jobs: any[];
@@ -44,13 +51,14 @@ type mainStateType = {
 }
 
 
+
 const Main = () => {
 
-   
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const [ footerInfoFlag, setFooterInfoFlag ] = useState (false)
     const [ mainBannerPosition, setMainBannerPosition ] = useState(1) //## 메인 배너 포지션
     const [ countUpCheck, setCountUpCheck ] = useState<boolean>(false) // ## 누적 데이터 카운트업 시작 체크
     const [ mainData, setMainData ] = useState<mainStateType>({ //## 메인 데이터
@@ -139,7 +147,6 @@ console.log("job",mainData.jobs)
     }
 
 
-    console.log(mainData.jobs)
     /**
      * 최저가 현황 리스트 Api
      * -----------------------------------------------------------------------------------------------------------------
@@ -240,7 +247,6 @@ console.log("job",mainData.jobs)
     const reviewList = useMemo(() => {
 
         let listData :any[] = [];
-        console.log("listData",listData)
         if (Utils.isEmpty(mainData.mainReviewList) || mainData.mainReviewList.length === 0) {
             return listData;
         }
@@ -293,7 +299,7 @@ console.log("job",mainData.jobs)
     };
 
 
-      /**
+    /**
      * 케어네이션 이용 현황 카운트 Rendering
      * -----------------------------------------------------------------------------------------------------------------
      */
@@ -320,8 +326,56 @@ console.log("job",mainData.jobs)
         return html;
     }, [mainData.careUseList, countUpCheck]);
 
+    /**
+     * 실시간 케어메이트 소식 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
 
+    //  랜덤으로 나타남
+    //  노란색 : mainNews__list--YL
+    //  초록색 : mainNews__list--GR
+    //  파란색 : mainNews__list--BL
 
+    const renderCareMate = () => {
+        return (
+            <Slider
+                autoplay={true}
+                autoplaySpeed={1000}
+                arrows={false}
+                infinite={true}
+                touchMove={true}
+                slidesToShow={1}
+                vertical={true}
+            >
+                {
+                    mainData.applicantList.map((item:any, index:any) => {
+                        return (
+                            <article className=
+                             {
+                                "mainNews__list--" + 
+                                (index < 6 ?
+                                (index % 3 === 0 ? "YL" : (index % 3 === 1 ? "GR" : "BL")) 
+                                :
+                                (index % 3 === 0 ? "GR" : (index % 3 === 1 ? "BL" : "YL")))
+                             }>
+                                <h3 className="txtStyle03-Wnoml">
+                                    보호자 <strong>{item.name}님</strong> 공고에<br />
+                                    <strong>케어메이트 지원 완료!</strong>
+                                </h3>
+                                <p className="txtStyle04-C555Wnoml">
+                                    {item.loc}
+                                </p>
+                                <div>
+                                    <span className="txtStyle06-W500">총 지원</span>
+                                    <p className="txtStyle01-Wbold">{Utils.numberWithCommas(item.cnt)}명</p>
+                                </div>
+                            </article>
+                        )
+                    })
+                }
+            </Slider>
+        )
+    }
 
 
     //옵저버
@@ -401,6 +455,7 @@ console.log("job",mainData.jobs)
     return (
         <>
             <Header
+                login={true}
             />
             <main>
                 <div className="subWrap">
@@ -418,7 +473,7 @@ console.log("job",mainData.jobs)
                             --> */}
                                 <div className="mainJobList">
                                     <div className="Job__tit">
-                                        <h2 className="txtStyle02">공고 목록 (<span>2</span>/3)</h2>
+                                        <h2 className="txtStyle02">공고 목록 (<span>0</span>/3)</h2>
                                     </div>
                                     <div className="mainJobList__none">
                                         <img src="../images/noneMainList.svg" alt="" />
@@ -529,9 +584,7 @@ console.log("job",mainData.jobs)
                                     <div className="mainChart">
                                         <div className="mainChart__pie">
                                             {/* 차트 넣는 자리 */}
-                                            <div style={{padding:"16px 0 20px", margin:"16px 0 20px"}}>
-                                                {/* <MemoPiechart graph={mainData.pieChartData}/> */}
-                                            </div>
+                                                <MemoPiechart graph={mainData.pieChartData} />
                                         </div>
                                         <div className="mainChart__legend">
                                             <dl>
@@ -569,8 +622,7 @@ console.log("job",mainData.jobs)
                             </div>
 
                             {/* 보호자 후기 데이터 붙이고 map으로 렌더링 */}
-                            <div className="mainRev__link" style={{overflow:"hidden"}}>
-                              {/* <div className="mainRev__link"> */}
+                            <div className="mainRev__link">
                               {renderReview()}
                             </div>
                         </article>
@@ -582,48 +634,8 @@ console.log("job",mainData.jobs)
                             <div className="mainItemWrap__tit">
                                 <h2 className="txtStyle02">실시간 케어메이트 소식 <span className="live">실시간</span></h2>
                             </div>
-                            <div className="mainNews__list">
-                                {/* <!-- 
-                                랜덤으로 나타남
-                                노란색 : mainNews__list--YL
-                                초록색 : mainNews__list--GR
-                                파란색 : mainNews__list--BL
-                                --> */}
-                                <article className="mainNews__list--YL">
-                                    <h3 className="txtStyle03-Wnoml">
-                                        보호자 <strong>홍*동님</strong> 공고에<br />
-                                        <strong>케어메이트 지원 완료!</strong>
-                                    </h3>
-                                    <p className="txtStyle04-C555Wnoml">
-                                        서울 대학교 병원 서울 대학교 병원 서울 대학교 병원 서울 대학교 병원
-                                    </p>
-                                    <div>
-                                        <span className="txtStyle06-W500">총 지원</span>
-                                        <p className="txtStyle01-Wbold">2명</p>
-                                    </div>
-                                </article>
-                                <article className="mainNews__list--GR">
-                                    <h3 className="txtStyle03-Wnoml">
-                                        보호자 <strong>홍*동님</strong> 공고에<br />
-                                        <strong>케어메이트 지원 완료!</strong>
-                                    </h3>
-                                    <p className="txtStyle04-C555Wnoml">서울 대학교 병원</p>
-                                    <div>
-                                        <span className="txtStyle06-W500">총 지원</span>
-                                        <p className="txtStyle01-Wbold">2명</p>
-                                    </div>
-                                </article>
-                                <article className="mainNews__list--BL">
-                                    <h3 className="txtStyle03-Wnoml">
-                                        보호자 <strong>홍*동님</strong> 공고에<br />
-                                        <strong>케어메이트 지원 완료!</strong>
-                                    </h3>
-                                    <p className="txtStyle04-C555Wnoml">서울 대학교 병원</p>
-                                    <div>
-                                        <span className="txtStyle06-W500">총 지원</span>
-                                        <p className="txtStyle01-Wbold">2명</p>
-                                    </div>
-                                </article>
+                            <div className="mainNews__list" style= {{ overflow: "hidden" }}>
+                                {renderCareMate()}
                             </div>
                         </article>
 
@@ -678,19 +690,19 @@ console.log("job",mainData.jobs)
 
             {/* <!-- 푸터  링크 연결  간병 서비스 신청 버튼 연결 , 사업자 정보 토글설정 --> */}
             <footer>
-                {/* <!-- 
-            app : mainBtn__bottom
-            모바일 : mainBtn__bottom mobile
-            --> */}
-                <section className="mainBtn__bottom">
-                    <button type="button">간병 서비스 신청하기</button>
+                {/* <!-- app : mainBtn__bottom   모바일 : mainBtn__bottom mobile  --> */}
+                <section className={"mainBtn__bottom" + (SERVER_TYPE ==="MOBILE"? "mobile" : "")}>
+                    <button 
+                        type="button"
+                        onClick={() => Utils.isAuthCheck() ? navigate("/care/new/extend") : navigate("/care/new/extend") }
+                    >간병 서비스 신청하기</button>
                 </section>
                 <section>
                     <h2 className="a11y-hidden">회사 법적 이슈 관련한 링크</h2>
                     <ul className="footer__link">
-                        <li><a href="">사업자 정보 확인</a></li>
-                        <li><a href="">이용약관</a></li>
-                        <li><a href="">개인정보처리방침</a></li>
+                        {/* <li><a href="">사업자 정보 확인</a></li> */}
+                        <li><a onClick={() => window.open("https://ci_protector.app.carenation.kr/clause/detail?detailType=agree", "_blank")}>이용약관</a></li>
+                        <li><a onClick={() => window.open("https://ci_protector.app.carenation.kr/clause/detail?detailType=user", "_blank")}>개인정보처리방침</a></li>
                     </ul>
                     <p className="txtStyle06-C777">
                         주식회사 에이치엠씨 네트웍스는 통신판매중개자로서 거래에 필요한 시스템을 운영 및
@@ -699,9 +711,12 @@ console.log("job",mainData.jobs)
                     </p>
                 </section>
                 {/* <!-- h2 클릭시 footer__company에 active 추가 --> */}
-                <section className="footer__company active">
-
-                    <h2 className="txtStyle06-C555Wnoml">주식회사 에이치엠씨 네트웍스 사업자 정보</h2>
+                <section className={"footer__company" + (footerInfoFlag ? " active" : "")}>
+                    <h2 className="txtStyle06-C555Wnoml"
+                    onClick = {() => {
+                        console.log("in")
+                        setFooterInfoFlag(!footerInfoFlag)}}
+                    >주식회사 에이치엠씨 네트웍스 사업자 정보</h2>
                     <dl className="footer__company--open">
                         <dt>서비스명</dt>
                         <dd>케어네이션</dd>
