@@ -1,4 +1,5 @@
 import * as LocalStorage from './localStorage'
+import Api from '../api/api'
 
 const IMG_PATH = process.env.REACT_APP_IMG_URL;
 
@@ -161,4 +162,238 @@ const IMG_PATH = process.env.REACT_APP_IMG_URL;
     }
 
     return true;
+}
+
+
+//##################################################################################################################
+//##
+//## >> Method : Adjust / Analytics
+//##
+//##################################################################################################################
+
+/**
+ * Adjust Action Check
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param value : adjust value
+ * @param userId : userId
+ */
+ export function adjustEvent(value: string, userId?: string) {
+    try {
+        if (osCheck() === 'android') {
+            const androidHandler = androidDevice();
+            try {
+                if (isEmpty(userId)) {
+                    androidHandler.adjustEvent(value);
+                } else {
+                    androidHandler.adjustEvent(value, userId);
+                }
+            } catch (e) {
+                androidHandler.adjustEvent(value);
+            }
+        } else if (osCheck() === 'ios') {
+            let iosData = {
+                value: value
+            };
+            if (!isEmpty(userId)) {
+                let userIdObj = {
+                    userId: userId
+                };
+                iosData = {
+                    ...iosData,
+                    ...userIdObj
+                };
+            }
+            const iosHandler = iosDevice('adjustEvent');
+            iosHandler.postMessage(iosData);
+        }
+    } catch (e) {
+    }
+}
+
+/**
+ * Analytics Action Check
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+export function analyticsEvent(value: string) {
+    try {
+        if (osCheck() === 'android') {
+            const androidHandler = androidDevice();
+            androidHandler.analyticsEvent(value);
+        } else if (osCheck() === 'ios') {
+            let iosData = {
+                value: value
+            };
+            const iosHandler = iosDevice('analyticsEvent');
+            iosHandler.postMessage(iosData);
+        }
+    } catch (e) {
+    }
+}
+
+/**
+ * Android Device Check
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+ export function androidDevice() {
+    const messageHandler = (window as any).AndroidApp;
+    return messageHandler;
+}
+
+/**
+ * IOS Device Check
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param functionName : Function Name
+ */
+export function iosDevice(functionName: string) {
+    const messageHandler =
+        (window as any).webkit &&
+        (window as any).webkit.messageHandlers &&
+        (window as any).webkit.messageHandlers[functionName];
+    return messageHandler;
+}
+
+/**
+ * OS Check
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+export function osCheck() {
+    let os = 'android';
+    try {
+        let ua = navigator.userAgent;
+
+        let checker = {
+            iphone: ua.match(/(iPhone|iPod|iPad)/),
+            android: ua.match(/Android/)
+        };
+
+        if (!ua.includes("connectionType/webview")) {
+            os = 'web';
+        } else if (checker.android) {
+            os = 'android';
+        } else if (checker.iphone) {
+            os = 'ios';
+        }
+    } catch (e) {
+        os = 'error';
+    }
+    return os;
+}
+
+
+/**
+ * Page Finish
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @type : page finish type
+ * @jsonData : JSONObject String Data
+ */
+ export function pageFinish(type?: string, jsonData?: String) {
+    try {
+        if (osCheck() === 'android') {
+            const androidHandler = androidDevice();
+            if (type) {
+                androidHandler.pageFinish(type, jsonData);
+            } else {
+                androidHandler.pageFinish();
+            }
+        } else if (osCheck() === 'ios') {
+            const iosHandler = iosDevice('pageFinish');
+            if (type) {
+                let iosData = {
+                    type: type,
+                    jsonData: jsonData
+                };
+                iosHandler.postMessage(iosData);
+            } else {
+                iosHandler.postMessage('');
+            }
+        }
+    } catch (e) {
+
+    }
+}
+
+/**
+ * 도로명주소 API 예외 처리(https://www.juso.go.kr/addrlink/devAddrLinkRequestWrite.do?returnFn=write&cntcMenu=URL)
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+ export function checkSearchedWord(value: string) {
+    if (value.length > 0) {
+        //특수문자 제거
+        let expText = /[%=><]/;
+        if (expText.test(value) == true) {
+            alert("특수문자를 입력 할수 없습니다.");
+            value = value.split(expText).join("");
+            return false;
+        }
+
+        //특정문자열(sql예약어의 앞뒤공백포함) 제거
+        let sqlArray = new Array(
+            //sql 예약어
+            "OR", "SELECT", "INSERT", "DELETE", "UPDATE", "CREATE", "DROP", "EXEC",
+            "UNION", "FETCH", "DECLARE", "TRUNCATE"
+        );
+
+        let regex;
+        for (let i = 0; i < sqlArray.length; i++) {
+            regex = new RegExp(sqlArray[i], "gi");
+
+            if (regex.test(value)) {
+                alert("\"" + sqlArray[i] + "\"와(과) 같은 특정문자로 검색할 수 없습니다.");
+                value = value.replace(regex, "");
+                return false;
+            }
+        }
+    }
+    return true ;
+}
+
+/**
+ * input Tag 엔터키 입력 시 포커싱 해제
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param e : Event
+ */
+ export function enterKeyPress(e: any) {
+    if (e.key === "Enter" || e.keyCode === 13) {
+        e.target.blur();
+    }
+}
+
+
+/**
+ * RSA PublicKey 가져오기
+ * -----------------------------------------------------------------------------------------------------------------
+ *
+ * @param authorization : Auth
+ * @param userId : User ID
+ * @param callback : CallBack Method
+ */
+ export function getRSAPublicKeyApi(authorization: string = "", userId: number, callback: (flag: boolean) => void) {
+    if (!isEmpty(authorization)) {
+        LocalStorage.setStorage(LocalStorage.AUTHORIZATION, authorization);
+    }
+    LocalStorage.setStorage(LocalStorage.USER_ID, userId);
+    try {
+        Api.getRSAPublicKey().then((response: any) => {
+            if (response.status === 200) {
+                let data = response.data;
+                if (data.code === 200) {
+                    LocalStorage.setStorage(LocalStorage.RSA_PUBLIC_KEY, data.data);
+                    callback(true)
+                } else {
+                    callback(false)
+                }
+            } else {
+                callback(false)
+            }
+        }).catch(err => {
+            console.log(err);
+            callback(false)
+        });
+    } catch (e) {
+        callback(false)
+    }
 }

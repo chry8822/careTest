@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../common/header';
 import { useNavigate } from 'react-router-dom';
 import * as Utils from '../../constants/utils'
 import ExtendTypePopup from './popup/popup'
 import { useDispatch } from 'react-redux';
 import { showPopup, hidePopup } from './../../redux/actions/popup/popup';
+import Popup from "../common/popup";
 
 
 const CareExtend = () => {
@@ -14,7 +15,26 @@ const CareExtend = () => {
 
     const [extendType, setExtendType] = useState('');
     const [placeType, setPlaceType] = useState('');
-    const [infoPopupFlag, setinfoPopupFlag] = useState<any>("");
+
+    //##################################################################################################################
+    //##
+    //## >> Override
+    //##
+    //##################################################################################################################
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+
+        // //### 공고 등록 store 초기화
+        // dispatch(initCare());
+
+        // socket = new SocketIO("");
+        // return () => {
+        //     if (socket != null) {
+        //         socket.viewStay();
+        //     }
+        // }
+    }, []);
 
     //##################################################################################################################
     //##
@@ -33,11 +53,45 @@ const CareExtend = () => {
     }
 
 
+    //##################################################################################################################
+    //##
+    //## >> Method : Private
+    //##
+    //##################################################################################################################
+
     // timeCare 시간제
     // placeCare 기간제
 
-    const validationData = () => {
+    const validationData = () => { //### 다음 버튼 활성화
         return Utils.isEmpty(extendType) || Utils.isEmpty(placeType)
+    }
+
+
+    /**
+     * 간병장소 선택 결과
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    const validationSelect = () => { //### 간병 서비스 선택 결과 팝업
+        let checkMsg;         
+        if(Utils.isEmpty(extendType)) {
+            checkMsg = "간병 서비스를 선택해주세요.";
+        } else if (Utils.isEmpty(placeType)) {
+            checkMsg = "간병 장소를 선택해주세요.";
+        }
+        if(checkMsg) {
+            dispatch(showPopup({element:Popup,action:popupAction,content:checkMsg}))
+        } else {
+            //### 간병 서비스 선택 Bottom Popup 노출
+            dispatch(showPopup
+                ({element:ExtendTypePopup,
+                  action:popupAction,
+                  type:"bottomPopup",
+                  title:extendType,
+                  content:placeType
+                }))
+                  // extendType 에 들어오는 시간제 , 기간제 타입을 타이틀로 넘겨줘서 해당 타입에 맞는 팝업 노출
+        }
     }
 
 
@@ -136,10 +190,7 @@ const CareExtend = () => {
                             type="button"
                             className={"btnColor" + (validationData() ? " disabled" : "")}
                             disabled={validationData()}
-                            onClick={() => {
-                                extendType === "timeCare01" ? setinfoPopupFlag("time") : setinfoPopupFlag("place")
-                                dispatch(showPopup({element:ExtendTypePopup,action:popupAction,type:"bottomPopup"}))
-                            }}
+                            onClick={() => validationSelect()}
                         >다음</button>
                     </div>
                 </div>

@@ -1,5 +1,6 @@
 import {
-    Popup
+    Popup,
+    Care,
 } from "./reducers/index";
 
 import {combineReducers, createStore} from "redux";
@@ -16,6 +17,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
     popup:Popup,
+    care: Care
 });
 // store 에서 최종적으로 하나의 store 를 내보내야 하기 때문에 combineReducers로 
 // reducer가 여러게면 하나의 rootReducer로 통합한다.

@@ -93,7 +93,11 @@ const Login = () => {
             if (data.code === 200) {
               LocalStorage.setStorage(LocalStorage.AUTHORIZATION, data.data.token_type + " " + data.data.access_token);
               LocalStorage.setStorage(LocalStorage.USER_ID, data.data.user.id);
-              navigate("/")
+
+              Utils.getRSAPublicKeyApi(data.data.token_type + " " + data.data.access_token, data.data.user.id, function (flag: boolean) {
+                navigate("/")
+            });
+              // navigate("/")
             } else {
               dispatch(showPopup({element:Popup,content:data.message,action:popupAction}))
             }
@@ -105,13 +109,13 @@ const Login = () => {
         });
       } catch (e) {
         console.log(e)
-      }
+      } 
     }
     
     // const test = "okh8822@hmcnetworks.co.kr"
     // console.log( "buffer", Buffer.from(test).toString('base64'))
     // console.log( "btoa", btoa(test))
-
+    // legacy web platform APIs
 
   return (
     <>

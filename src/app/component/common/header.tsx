@@ -84,7 +84,7 @@ const Header = ({logoHeader=false ,historyBack = false, title = "", headerClass 
                                     login && <button 
                                             type="button" 
                                             className="grayBtn"
-                                            onClick={() => navigate("/login")}
+                                            onClick={() => navigate("/care/login")}
                                             >회원가입/로그인</button>
                                 }
 
