@@ -695,6 +695,7 @@ console.log("job",mainData.jobs)
                     <button 
                         type="button"
                         onClick={() => Utils.isAuthCheck() ? navigate("/care/new/extend") : navigate("/care/new/extend") }
+                        // 작성중인 데이터 확인
                     >간병 서비스 신청하기</button>
                 </section>
                 <section>

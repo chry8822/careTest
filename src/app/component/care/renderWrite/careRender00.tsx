@@ -7,7 +7,7 @@ interface CareRender00Props {
     setData: (data: any) => void;
 }
 
-const CareRender = ({ registerData, setData }: CareRender00Props) => {
+const CareRender00 = ({ registerData, setData }: CareRender00Props) => {
 
     //##################################################################################################################
     //##
@@ -83,4 +83,4 @@ const CareRender = ({ registerData, setData }: CareRender00Props) => {
     )
 }
 
-export default CareRender;
+export default CareRender00;

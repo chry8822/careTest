@@ -1,5 +1,6 @@
 import * as LocalStorage from './localStorage'
 import Api from '../api/api'
+import moment from 'moment';
 
 const IMG_PATH = process.env.REACT_APP_IMG_URL;
 
@@ -396,4 +397,25 @@ export function osCheck() {
     } catch (e) {
         callback(false)
     }
+}
+
+/**
+ * Date Converting
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param date : Date Value
+ * @param format : format
+ */
+ export function convertDateToString(date: any, format: string = "YYYY-MM-DD") {
+    return moment(date).format(format);
+}
+
+/**
+ * Time Converting
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param momentTime : Time Value
+ */
+export function convertTimeToString(momentTime: any) {
+    return moment(momentTime, 'HH:mm').format('HH:mm');
 }

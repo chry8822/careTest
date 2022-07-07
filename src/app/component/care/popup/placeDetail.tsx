@@ -94,8 +94,9 @@ const CarePlaceDetailPopup = ({jobType, placeType,selectPlace}:CarePlaceDetailPo
         setUncertainFlag(false);
         setEtcWarning(false);
         
-        popup.action(popup.actionType, {...selectPlace, detail: uncertainFlag ? '(호실 미정)' : detailEtcAddress});
-
+        // popup.action(popup.actionType, {...selectPlace, detail: uncertainFlag ? '(호실 미정)' : detailEtcAddress});
+    
+        popup.action(popup.actionType, {...selectPlace, detail: uncertainFlag ? '(호실 미정)' : detailEtcAddress})
     };
 
     /**

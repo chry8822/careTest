@@ -34,6 +34,7 @@ const Root: React.FC  = ()=> {
                             </Route>
                             <Route path="write">
                                 <Route path=":type/:step/:time/:place" element={<CareWrite/>}/>
+                                <Route path=":type/:step/:time/:place/:familyId" element={<CareWrite/>}/>
                             </Route>
                         </Route>
                       </Routes>
