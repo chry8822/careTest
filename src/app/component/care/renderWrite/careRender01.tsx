@@ -45,6 +45,8 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
      *
      * @params date : 선택한 날짜 문자열 (YYYY-MM-DD)
      */
+
+    // 확인해보기
         const selectCareDate = (date: string) => {
             console.log("pickDate",date)
             if (registerData.selectDate && date === registerData.startDate) { //### 간병 시작일 선택 시 수정 막기
