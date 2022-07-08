@@ -419,3 +419,16 @@ export function osCheck() {
 export function convertTimeToString(momentTime: any) {
     return moment(momentTime, 'HH:mm').format('HH:mm');
 }
+
+/**
+ * Calendar How Many Weeks
+ * Weeks start on Another
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+ export function weeks(year: number, month: number) {
+    let firstDay = new Date(year, month, 1).getDay(); //## 1일의 요일
+    let lastDay = new Date(year, month + 1, 0).getDate(); //## 마지막 날짜
+    let result = Math.ceil((firstDay + lastDay) / 7);
+
+    return result;
+}

@@ -13,7 +13,7 @@ export const InitialCare: CareType = {
     startTime: moment(moment().subtract(-1, "hours")).format(formatHourTime),
     endDate: moment(moment().add(7, "days")).format(formatDate),
     endTime: moment(moment().subtract(-1, "hours")).format(formatHourTime),
-    selectOption: 1,
+    selectOption: "1",
     selectDate: moment().format(formatDate),
     name: "",
     gender: 0,

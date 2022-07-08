@@ -7,7 +7,7 @@ export interface CareType {
     startTime: string;            //## 시작시간
     endDate: string;              //## 종료날짜
     endTime: string;              //## 종료시간
-    selectOption: number;         //## 시간제 간병 시간 select 옵션
+    selectOption: any;         //## 시간제 간병 시간 select 옵션
     selectDate: string;           //## 선택한 날짜 문자열
     coronaCheck: number;          //## 코로나 검사 유무
     favoriteGender: number;       //## 우대하는 케어메이트 성별

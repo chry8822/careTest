@@ -216,7 +216,13 @@ const CareWrite = () => {
     const prevStep = () => {
         if (step === 0 || detailPlaceType === "edit") {
             navigate(-1)
+        } else {
+            let moveStep: number;
+            moveStep = (requestType === "home" && step === 4) ? step - 2 : step - 1;
+            navigate(`/care/write/register/${moveStep}/${jobType}/${requestType}`, {replace: true});
+            setStep(moveStep);
         }
+        
     }
 
 
@@ -444,13 +450,27 @@ const CareWrite = () => {
             )
         } else if (step === 1) {
             return (
-                <div className="noticeInfo__txt">
-                    <h2>선택 이후에 간병기간이 변동 된다면?</h2>
-                    <p>
-                        선택 이후에 간병기간이 변동되는 경우, 선택 된 간병인에게 고지하신 후에 케어네이션
-                        고객센터(1811 - 5949)로 접수해 주시기 바랍니다.
-                    </p>
-                </div>
+                <>
+                    {/* <div className="noticeInfo__agree">
+                        <div className="noticeInfo__agree--tit">
+                            <h2 className="txtStyle03">
+                            개인정보 제3자 제공 동의서<span className="txtRed">필수</span>
+                            </h2>
+                            <a href="" className="secession">보기</a>
+                        </div>
+                        <div className="checkSelect__box">
+                            <input type="checkbox" id="noticeAgree" name="noticeAgree" />
+                            <label htmlFor="noticeAgree" className="mb0">네, 동의합니다.</label>
+                        </div>
+                    </div> */}
+                    <div className="noticeInfo__txt">
+                        <h2>선택 이후에 간병기간이 변동 된다면?</h2>
+                        <p>
+                            선택 이후에 간병기간이 변동되는 경우, 선택 된 간병인에게 고지하신 후에 케어네이션
+                            고객센터(1811 - 5949)로 접수해 주시기 바랍니다.
+                        </p>
+                    </div>
+                </>
             )
         } else if (step === 2) {
             <div className="noticeInfo__txt">
@@ -502,10 +522,16 @@ const CareWrite = () => {
 
                         {
                             step === 1 ?
-                            <RenderCare01 registerData={detailPlaceType === "register" ? careData : editData} setData={setData} jobType={jobType} careTimeCheckMsg={careTimeValidationCheck()} />
+                            <RenderCare01 
+                                registerData={detailPlaceType === "register" ? careData : editData} 
+                                setData={setData} 
+                                jobType={jobType} 
+                                careTimeCheckMsg={careTimeValidationCheck()} />
                             :
                             <Suspense fallback={null}>
-                                <RenderCare registerData={detailPlaceType === "register" ? careData : editData} setData={setData} />
+                                <RenderCare 
+                                    registerData={detailPlaceType === "register" ? careData : editData} 
+                                    setData={setData} />
                             </Suspense>
                         }
 
