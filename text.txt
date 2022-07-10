@@ -1,0 +1,101 @@
+// let count = 0;
+// let calendarData = [];1
+// let totalCount = 0;
+// const startDay = 9;
+// const startDayIndex = 6;
+
+// // 현재 달
+// for(let i = startDay - startDayIndex; i <= 31; i++) {
+//     count++;
+//     if (i >= startDay) {
+//         totalCount++;
+//     }
+//     weekData.push(i);
+//     if (count === 7) {
+//         calendarData.push(weekData.join(','));
+//         weekData = [];
+//         count = 0;
+//     }
+
+//     // 다돌았는데, weekData에 데이터가 남아있는경우
+//     if( i == 31 && count !== 7) {
+//         calendarData.push(weekData.join(','));
+//         weekData = [];
+//         count = 0;
+//     }
+// }
+
+// let nextCalendarDate = [];
+// if (totalCount < 30) {
+//     const nextMonthDayIndex = 1;
+//     for(let i = 1 - nextMonthDayIndex; i <= 31; i++) {
+//         count++;
+//         if (i >= 1) {
+//             totalCount++;
+//         }
+//         weekData.push(i);
+
+//         if (totalCount === 30) {
+//             nextCalendarDate.push(weekData.join(','));
+//             break;
+//         }
+
+//         if (count === 7) {
+//             nextCalendarDate.push(weekData.join(','));
+//             weekData = [];
+//             count = 0;
+//         }
+    
+//         if( i == 31 && count !== 7) {
+//             nextCalendarDate.push(weekData.join(','));
+//         }
+
+//     }
+// }
+
+
+
+
+
+// A
+dispatch(showPopup(
+  () => CarePlaceDetailPopup({
+  jobType: jobType, requestType: requestType, selectPlace: selectPlace
+  }), // element
+  popupAction, //  팝업엘리먼트에서 뭔가 호출하고 싶은 함수
+ "selectAddress", 
+ "popup", 
+ requestType));
+
+cosnt [detail, setDetail] = useState<string>('(호실 미정)');
+
+const popupAction = (type, data) => {
+  const { detail } = data;
+  setDetail(detail);
+}
+
+  return (
+    <>
+      현재 호실은
+      { detail }
+    </>
+  )
+}
+
+
+
+// CarePlaceDetailPopup (jobType, requestType, selectPlace)
+ const popup = useSelector((state: RootState) => state.popup); 
+popup.action(popup.actionType, {...selectPlace, datail : uncertainFlag ? '(호실 미정)' : detailAddress});
+
+
+
+// 어딘가에 저장 (리덕스 스토어)
+
+() => CarePlaceDetailPopup({
+  jobType: jobType, requestType: requestType, selectPlace: selectPlace
+  }), // element
+  popupAction, //  팝업엘리먼트에서 뭔가 호출하고 싶은 함수
+ "selectAddress", 
+ "popup", 
+ requestType)

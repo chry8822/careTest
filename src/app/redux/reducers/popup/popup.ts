@@ -20,3 +20,4 @@ export default popup;
 
 // 타입이 SHOW_POPUP 일때 팝업의 초기값, aciton.payload , show: true 가 담긴 객체를 반환.
 // 타입이 HIDE_POPUP 일때 팝업의 초기값 반환 (show: false) 
+

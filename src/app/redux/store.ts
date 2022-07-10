@@ -16,7 +16,7 @@ const persistConfig = {
 }
 
 const rootReducer = combineReducers({
-    popup:Popup,
+    popup: Popup,
     care: Care
 });
 // store 에서 최종적으로 하나의 store 를 내보내야 하기 때문에 combineReducers로 

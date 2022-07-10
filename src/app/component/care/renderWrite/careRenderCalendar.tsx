@@ -36,6 +36,7 @@ const CareRenderCalendar = ({curDate, jobData, selectCareDate}: RenderTimeCalend
         // console.log(calendarDate)
 
         let items: React.ReactElement[] = [];
+        console.log('calendarDate', calendarDate)
         for (let i = 0; i < lastWeek; i++) {
             items.push(
                 <div className="calendar__detail--col" key={Math.random()}>
@@ -86,6 +87,7 @@ const CareRenderCalendar = ({curDate, jobData, selectCareDate}: RenderTimeCalend
 
 
     const renderCalendarDate = (date: any, week: number) => {
+        console.log('date', date, jobData);
         //배열 변수
         let html: React.ReactElement[] = [];
         //startDate = 시작 날짜
@@ -105,8 +107,10 @@ const CareRenderCalendar = ({curDate, jobData, selectCareDate}: RenderTimeCalend
         for (let i = 0; i < 7; i++) {
             //해당 주 의 요일 구하기
             let dayOfWeek = new Date(year, month, date.format("DD")).getDay();
+            console.log('dayOfWeek', dayOfWeek, date.format("DD"));
             // 마지막 날짜 (다음달의 마지막 요일과 날짜)
             let lastDate =  new Date(year, month + 1 , 0);
+            console.log('lastDate', lastDate);
 
             // 선택된 요소에 className 붙이기
             let className: string = "";
@@ -121,6 +125,7 @@ const CareRenderCalendar = ({curDate, jobData, selectCareDate}: RenderTimeCalend
                 // 첫번째 주 에서 시작되는 날짜에 앞까지 빈 span 을 렌더링
                 // 아래 if 문의 조건에 두번째 조건은 첫번째 주에만 적용되야 하기 때문에 현재 (주) 에서 현재 월에 시작 (주) 를 뺀값이 0이 아닌 조건이 있음
                 // 만약 첫번째 (주) 이면 뺀값이 0 이 나오므로 해당 if 문을 타지 않음
+                console.log('moment(curDate).startOf("month").week()', moment(curDate).week(), moment(curDate).startOf("month").week())
                 if (isFirstCalendar && moment(curDate).week() - moment(curDate).startOf("month").week() !== 0) {
                     continue;
                 }
@@ -184,3 +189,20 @@ const CareRenderCalendar = ({curDate, jobData, selectCareDate}: RenderTimeCalend
 };
 
 export default CareRenderCalendar;
+
+
+// const CareSelectionCalendar = () => {
+//     const { calendarData, nextCalenData } = useCalendarDate(startDate);
+
+//     return (
+//         <>
+//             {calendarData && 
+//                 <
+//             }
+//             '
+//             {nextCalenData &&
+//                 asdfasdf
+//             }
+//         </>
+//     ) 
+// }

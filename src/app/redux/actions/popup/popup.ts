@@ -25,7 +25,6 @@ interface ShowPopupType {
     btn02?: string 
     actionType?: string | any,
 }
-
 export const showPopup = ({...props}:ShowPopupType) => ({
     type: SHOW_POPUP,
     payload: props
