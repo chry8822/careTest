@@ -10,7 +10,7 @@ import Dompurify from "dompurify";
 import * as Utils from '../../../constants/utils'
 import CareRenderCalendar from './careRenderCalendar'
 import * as LocalStorage from '../../../constants/localStorage'
-
+// import CareRenderCalendarTest from './careRenderCalendarTest'
 
 interface RenderCare01Props {
     registerData: CareType;
@@ -31,13 +31,26 @@ const formatHaveTime: string = "H[시간]"
 const formatSelectTime: string = "H"
 
 
-
+/**
+ * 간병 시간 선택 Rendering
+ * -----------------------------------------------------------------------------------------------------------------
+ */
 
 const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag, disabledHours }: RenderCare01Props) => {
     const CARE_DAY_ARRAY: string[] = ["일", "월", "화", "수", "목", "금", "토"]; //## 시간제 간병 요일 선택 Array
 
+    function disabledTime() {
+        return [0]
+    }
 
     // console.log("selectDate",registerData.selectDate)
+
+
+    //##################################################################################################################
+    //##
+    //## >> Method : private
+    //##
+    //##################################################################################################################
     
     /**
      * 시간제 간병 달력 날짜 선택 처리
@@ -47,26 +60,24 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
      */
 
     // 확인해보기
-        const selectCareDate = (date: string) => {
-            console.log("pickDate",date)
-            if (registerData.selectDate && date === registerData.startDate) { //### 간병 시작일 선택 시 수정 막기
-                return;
-            }
-            let selectStr: string = registerData.selectDate;
-            if (selectStr.includes(date)) {
-                if (selectStr.includes(',' + date)) {
-                    selectStr = selectStr.replaceAll(',' + date, '');
-                } else if (selectStr.includes(date + ',')) {
-                    selectStr = selectStr.replaceAll(date + ',', '');
-                } else {
-                    selectStr = selectStr.replaceAll(date, '');
-                }
+    const selectCareDate = (date: string) => {
+        if (registerData.selectDate && date === registerData.startDate) { //### 간병 시작일 선택 시 수정 막기
+            return;
+        }
+        let selectStr: string = registerData.selectDate;
+        if (selectStr.includes(date)) {
+            if (selectStr.includes(',' + date)) {
+                selectStr = selectStr.replaceAll(',' + date, '');
+            } else if (selectStr.includes(date + ',')) {
+                selectStr = selectStr.replaceAll(date + ',', '');
             } else {
-                selectStr += selectStr ? ',' + date : date;
+                selectStr = selectStr.replaceAll(date, '');
             }
-            changeCareDate(selectStr);
-            console.log("selectStr", selectStr)
-        };
+        } else {
+            selectStr += selectStr ? ',' + date : date;
+        }
+        changeCareDate(selectStr);
+    };
 
     /**
      * 시간제 간병 날짜 선택 데이터 가공 및 액션 처리
@@ -155,6 +166,7 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
         });
     };
 
+    console.log("startDate" ,moment(Utils.convertDateToString(registerData.startDate)))
 
      /**
      * 시간제 간병 - 필요한 시간 데이터 가공 및 액션 처리
@@ -166,16 +178,19 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
         const {startDate, startTime, selectDate} = registerData;
         const selectDateArr: string[] = selectDate.split(",");
         const endDate = Utils.convertDateToString(selectDateArr[selectDateArr.length - 1]) + ' ' + moment(startTime, formatTimeSecond).format(formatTimeSecond);
+        let selectOption = e.format(formatSelectTime)
 
-        // console.log("e",e.format("HH"))
+
         setData({
-            selectOption: e.format(formatSelectTime),
+            selectOption: selectOption,
             endDate: moment(endDate).add(Number(endDate), 'hours').format(formatDate),
-            endTime: moment(Utils.convertDateToString(startDate) + ' ' + moment(startTime, formatTimeSecond).format(formatHaveTime)).add(Number(registerData.endTime), "hours").format(formatHourTime)
+            endTime: moment(Utils.convertDateToString(startDate) + ' ' + moment(startTime, formatTimeSecond).format("HH:mm:ss")).add(Number(selectOption), "hours").format(formatHourTime)
         });
     };
-    // console.log("selet",registerData.selectOption)
-    // console.log("data",registerData)
+
+    // console.log("registerData.startDate",registerData.startDate)
+    // console.log("registerData.endTime",registerData.endTime)
+    // console.log("selectOption",registerData.selectOption)
 
     /**
      * 시간제 간병 달력 요일 버튼 처리
@@ -228,6 +243,7 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
     //             Math.floor(-168 % 24)
     // )
 
+    // console.log("registerData.startDate",registerData.startDate)
 
     //##################################################################################################################
     //##
@@ -394,9 +410,16 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
                                         jobData={registerData}
                                         selectCareDate={selectCareDate}
                                     />
+                                    {/* <CareRenderCalendarTest 
+                                        curDate={moment(registerData.startDate)}
+                                        jobData={registerData}
+                                        selectCareDate={selectCareDate}
+                                    /> */}
                                     <p className="txtStyle05-C777">
                                         ※ 시작 일을 기준으로 최대 30일까지만 선택할 수 있습니다.
                                     </p>
+
+
 
                                 </div>
                                 <div className="select__list pt40">
@@ -411,9 +434,8 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
                                                             className=""
                                                             showSecond={false}
                                                             showMinute={false}
-                                                            // value={moment().set("hour", Number(registerData.startTime.split(":")[0])).set("minutes", 0)}
-                                                            // value={testValue}
                                                             value={moment().set("hour", Number(registerData.startTime.split(":")[0])).set("minutes", 0)}
+                                                            // value={moment(Number(registerData.selectOption))}
                                                             onChange={(e) => changeStartCareTime(e)}
                                                             format={formatTime}
                                                             use12Hours={false}
@@ -435,7 +457,8 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
                                                             className=""
                                                             showSecond={false}
                                                             showMinute={false}
-                                                            value={moment().set("hour", Number(registerData.selectOption)).set("minutes", 0)}
+                                                            value={moment().set("hour", Number(registerData.selectOption))}
+                                                            // value={moment(Number(registerData.selectOption)).set("minutes", 1)}
                                                             onChange={(e) => {
                                                                 changeNeedCareTime(e)
                                                             }}
@@ -444,7 +467,8 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
                                                             inputReadOnly
                                                             placeholder="시간 선택"
                                                             clearIcon={' '}
-                                                            disabledHours={disabledHours ? () => disabledHours : undefined}
+                                                            defaultValue={moment()}
+                                                            disabledHours={disabledTime}
                                                         />
                                                     {/* </select> */}
                                                 </div>

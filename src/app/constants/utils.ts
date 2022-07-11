@@ -3,6 +3,23 @@ import Api from '../api/api'
 import moment from 'moment';
 
 const IMG_PATH = process.env.REACT_APP_IMG_URL;
+const ENCRYPTION_TYPE = process.env.REACT_APP_ENCRYPTION_TYPE;
+
+
+const crypto = require('crypto');
+const pkcs7 = require("pkcs7");
+const chainingMode = "AES-256-CBC";
+
+
+/**
+ * MD5 암호화
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+ export function md5() {
+    let md5 = require('md5');
+
+    return md5('aes');
+}
 
 /**
  * Empty Check
@@ -431,4 +448,150 @@ export function convertTimeToString(momentTime: any) {
     let result = Math.ceil((firstDay + lastDay) / 7);
 
     return result;
+}
+
+/**
+ * Not Hangul Pattern Regex
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param value : Value
+ */
+ export function notHangulCheck(value: string, flag?: boolean) {
+    let regExp = /[a-z0-9]|[ \[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"\\]/g;
+    let result = regExp.test(value);
+    if (result && !isEmpty(value) && value.length > 1 && flag) {
+        let valueArr = value.split("");
+        if (valueArr[1] === "*") {
+            if (!regExp.test(value.substring(0, 1))) {
+                result = regExp.test(value.substring(2))
+            }
+        }
+        if (value === "**") {
+            result = true;
+        }
+    }
+    return result;
+}
+
+
+/**
+ * 금칙어 체크 Api
+ * -----------------------------------------------------------------------------------------------------------------
+ */
+ export function badwordsCheckApi(data: any, callback?: any) {
+    try {
+        if (ENCRYPTION_TYPE === "TRUE") {
+            let userId = LocalStorage.getStorage(LocalStorage.USER_ID);
+
+            data = encryptAES256(JSON.stringify(data), userId ? userId : "carenation");
+        }
+        Api.badwordsCheck(data).then((response: any) => {
+            if (response.status === 200) {
+                if (callback) {
+                    if (response.data.code === 200) {
+                        callback(true);
+                        return;
+                    }
+                    console.log("금칙어",response.data.data)
+
+                    let arr: any[] = [];
+                        for (let i = 0; i < response.data.data.length; i++) {
+                            for (let j = 0; j < response.data.data[i].length; j++) {
+                                if (arr.indexOf(response.data.data[i][j]) === -1) arr.push(response.data.data[i][j]);
+                            }
+                        }
+
+                    callback(false, arr);
+                    return;
+                }
+            } else {
+                callback(false);
+                return;
+            }
+        }).catch(err => {
+            console.log(err);
+            callback(false);
+            return;
+        });
+    } catch (e) {
+        callback(false);
+        return;
+    }
+}
+
+/**
+ * AES 암호화
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param str : 암호화 값
+ */
+ export function encryptAES256(str: string, encryptKey?: string) {
+    let userId = LocalStorage.getStorage(LocalStorage.USER_ID);
+    if (isEmpty(userId)) {
+        userId = encryptKey ? encryptKey : "";
+    }
+
+    if (isEmpty(userId)) {
+        return;
+    }
+
+    /**
+     * binary 변환
+     * ---------------------------------------------------------------------------------------------------------------------
+     *
+     * @param len : byte length
+     */
+    const byteChange = (len: number) => {
+        let result = "";
+        if (userId) {
+            let flag = isNumber(userId); //## str 문자열이 숫자인지 문자인지 체크
+            let tempResult = "";
+            for (let i = 0; i < userId.length; i++) {
+                if (flag) {
+                    tempResult += userId[i];
+                } else {
+                    tempResult += userId[i].charCodeAt(0);
+                }
+            }
+            for (let i = 0; i < len; i++) {
+                result += String.fromCharCode(i < tempResult.length ? (tempResult[i].charCodeAt(0) - '0'.charCodeAt(0)) : 0);
+            }
+        }
+        return result;
+    };
+
+    /**
+     * AES256 암호화
+     * ---------------------------------------------------------------------------------------------------------------------
+     *
+     * @param str : String Value
+     */
+    const encrypt = (str: string) => {
+        const cipher = crypto.createCipheriv(chainingMode, privateKey, ivKey);
+        cipher.setAutoPadding(false);
+        let encrypted = cipher.update(pkcs7Pad(str), undefined, "base64");
+        encrypted += cipher.final("base64");
+        return encrypted;
+    };
+
+    /**
+     * AES256 암호화 pkcs7
+     * ---------------------------------------------------------------------------------------------------------------------
+     *
+     * @param params : Params
+     */
+    const pkcs7Pad = (params: string) => {
+        const buffer = Buffer.from(params, "utf8");
+        const bytes = new Uint8Array(buffer.length);
+        let i = buffer.length;
+        while (i--) {
+            bytes[i] = buffer[i];
+        }
+        return Buffer.from(pkcs7.pad(bytes) as Uint8Array);
+    };
+
+    const privateKey = byteChange(32); //## 32byte
+    const ivKey = byteChange(16); //## 16byte
+
+    return encrypt(str);
 }

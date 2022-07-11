@@ -11,6 +11,7 @@ const apiCarePrefix = "/v3_0/protector";
 const apiCommonPrefix = process.env.REACT_APP_COMMON_API_URL;
 const apiCaregiverPrefix = `${apiBasePrefix}/v2/caregiver`;
 
+const ENCRYPTION_TYPE = process.env.REACT_APP_ENCRYPTION_TYPE;
 const SERVER_TYPE = "CI";
 const MAIN_API = "/main";
 const LOWEST_PRICE_API = "/job/main";
@@ -18,8 +19,10 @@ const LOGIN_API = "/login";
 const PREFER_HOSPITAL_NEW_API = "/hospital-new";   
 const GET_RSA_PUBLIC_KEY_API = "v2/common/user/key";
 const PATIENTS = "/patients";   
-let auth = LocalStorage.getStorage(LocalStorage.AUTHORIZATION) || "";
+const SIGN_UP_BAD_WORDS_API = "/badwords";  
+const BAD_WORDS_API = "/bad_words"
 
+let auth = LocalStorage.getStorage(LocalStorage.AUTHORIZATION) || "";
 
 
 const apiAxios = axios.create({
@@ -39,6 +42,39 @@ function baseApi(apiUrl: string = "") {
     return test;
 }
 
+function getMD5Header() {
+    if (ENCRYPTION_TYPE === 'TRUE') {
+        let auth = LocalStorage.getStorage(LocalStorage.AUTHORIZATION);
+
+        return {
+            headers: {
+                'Content-Type': 'text/plain',
+                'User-Content-Type': Utils.md5(),
+                'Authorization': auth ? auth : ""
+            }
+        }
+    } else {
+        return {
+            headers: {
+                'Authorization': auth
+            }
+        }
+    }
+}
+
+
+function getAccessTokenHeader() {
+    let auth = LocalStorage.getStorage(LocalStorage.AUTHORIZATION);
+    if (auth) {
+        return {
+            headers: {
+                'Authorization': auth
+            }
+        }
+    } else {
+        return
+    }
+}
 
 // api 데이터 상태 체크
 function successStatusCheck(response: any, resolve: any) {
@@ -87,7 +123,7 @@ export function mainList () {
             axios({
                 method: "get",
                 url: baseApi(apiCarePrefix) + MAIN_API,
-                headers: {"Authorization": auth}
+                headers: {"Authorization": auth } || getAccessTokenHeader()
             })    
             .then((response) => {
                 successStatusCheck(response,resolve)
@@ -279,6 +315,50 @@ export function patientDetail(familyId: number) {
     })
 }
 
+/**
+ * 금칙어 체크하기(UserId가 존재하지 않는다면 carenation으로 AES 암호화를 진행하고, UserId가 존재한다면 UserId로 AES 암호화를 진행한다.)
+ * -----------------------------------------------------------------------------------------------------------------
+ *
+ * @param data : Post Data Value
+ */
+ export function badwordsCheck(data: any) {
+    let auth = LocalStorage.getStorage(LocalStorage.AUTHORIZATION) || "";
+    let userId = LocalStorage.getStorage(LocalStorage.USER_ID);
+    let queryString = Utils.isEmpty(userId) ? `/${Buffer.from("carenation").toString('base64')}` : "";
+    let api = Utils.isEmpty(userId) ? SIGN_UP_BAD_WORDS_API : BAD_WORDS_API;
+
+    return new Promise((resolve, reject) => {
+            // apiAxios.post(baseApi(apiCommonPrefix) + api + queryString, data, )
+            return axios({
+                method: "post",
+                url: baseApi(apiCommonPrefix) + api + queryString,
+                data: {
+                    ...data
+                },
+                headers :
+                ENCRYPTION_TYPE === "TRUE" ?
+                {   
+                    'Content-Type': 'text/plain',
+                    'User-Content-Type': Utils.md5(),
+                    'Authorization': auth ? auth : ""
+                }
+                :
+                {
+                    'UserType': 'protector',
+                    'AppVersion': '1.0.0',
+                    'Content-Type': 'application/json',
+                    'UserAgent': SERVER_TYPE ? SERVER_TYPE : "",
+                    'Authorization': auth
+                }
+            })
+            .then((response) => {
+                successStatusCheck(response, resolve)
+            }).catch(err => {
+                failStatusCheck(err, reject)
+            });
+        } 
+    )
+}
 
 
-export default {mainList,lowestPriceList,login,addressList,hospitalListNew,getRSAPublicKey,patientDetail } 
+export default {mainList,lowestPriceList,login,addressList,hospitalListNew,getRSAPublicKey,patientDetail,badwordsCheck } 

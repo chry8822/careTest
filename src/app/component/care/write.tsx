@@ -132,6 +132,8 @@ const CareWrite = () => {
         }
     };
 
+    console.log("careData",careData.selectOption)
+
     /**
      * Validation Check  (코로나 검사 유무)
      * -----------------------------------------------------------------------------------------------------------------
@@ -176,6 +178,8 @@ const CareWrite = () => {
         const {startDate, startTime, endDate, endTime, selectDate} = detailPlaceType === "edit" ? editData : careData;
         let checkMsg: string = "";
 
+        console.log("endTime",endTime)
+        // console.log("moment(endTime, formatTime)",moment(endTime, formatTime))
         let tempTimeFormat = "HH:mm:ss";
 
         let dateStart = Utils.convertDateToString(startDate) + ' ' + moment(startTime, tempTimeFormat).format(tempTimeFormat);
@@ -205,8 +209,80 @@ const CareWrite = () => {
         return checkMsg;
     }
 
+  /**
+     * Validation Check  (환자 정보 입력)
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    const inputCheckValidationMsg = () => {
+
+        const {name, gender, age, height, weight, diagnosis} = detailPlaceType === "edit" ? editData : careData;
+        let checkMsg:string ="";
+        if(Utils.isEmpty(name)) {
+            checkMsg = "이름을 입력해주세요."
+        }else if(name.length < 2) {
+            checkMsg = "이름은 두글자 이상 입력해주셔야 합니다.";
+        }else if(Utils.notHangulCheck(name, true)) {
+            checkMsg ="이름은 한글만 입력하실 수 있습니다."
+        } else if (gender === 0) {
+            checkMsg = "성별을 선택해주세요.";
+        } else if(Utils.isEmpty(age)) {
+            checkMsg ="나이를 입력해주세요."
+        }else if(!Utils.isNumber(age)) {
+            checkMsg ="나이는 숫자만 입력하실 수 있습니다."
+        }else if(Utils.isEmpty(height)) {
+            checkMsg ="키를 입력해주세요."
+        }else if(!Utils.isNumber(height)) {
+            checkMsg ="키는 숫자만 입력하실 수 있습니다."
+        }
+        else if(Utils.isEmpty(weight)) {
+            checkMsg ="몸무게를 입력해주세요."
+        }else if(!Utils.isNumber(weight)) {
+            checkMsg ="몸무게는 숫자만 입력하실 수 있습니다."
+        }else if(Utils.isEmpty(diagnosis)) {
+            checkMsg ="진단명을 입력해주세요."
+        }else if (diagnosis) {
+            badwordsCheck([diagnosis], ["진단명"]);
+            return "badwordsCheck";
+        }
+
+        console.log(diagnosis)
+        return checkMsg;
+    }
 
 
+        /**
+     * 금칙어 Check
+     * -----------------------------------------------------------------------------------------------------------------
+     *
+     * @param words: 금칙어 체크 문자열 배열
+     * @param careWord: 금칙어 체크 문자열 텍스트 배열
+     */
+         const badwordsCheck = (words: any[], careWord: any[]) => {
+            let data = {
+                words: words[0]
+            };
+    
+            Utils.badwordsCheckApi(data, function (flag: boolean, badWords?: string[]) {
+                if (flag) {
+                    words.shift();
+                    careWord.shift();
+                    if (words.length > 0) {
+                        badwordsCheck(words, careWord);
+                    } else {
+                        setNextStep();
+                    }
+                } else {
+                    if (badWords) {
+                        let badWord: string = `(${badWords.join(", ")})`;
+                        let msg: string = `${careWord[0]}에 금칙어${badWord}가 포함되어 있습니다.`;
+                        dispatch(showPopup({element:Popup, action:popupAction,content:msg}));
+                    } else {
+                        dispatch(showPopup({element:Popup, action:popupAction}));
+                    }
+                }
+            });
+        };
 
 
     /**
@@ -239,7 +315,7 @@ const CareWrite = () => {
         } else if(step === 1) {
             validationCheckMsg = careTimeValidationCheck()
         } else if(step === 2) {
-            
+            validationCheckMsg = inputCheckValidationMsg()
         } else if(step === 3) {
             
         } else if(step === 4) {
