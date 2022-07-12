@@ -29,8 +29,9 @@ const CareRender03 = ({ registerData, setData }: CareRender00Props) => {
      */
     const popupAction = (type: string) => {
         dispatch(hidePopup());
-
     };
+
+    console.log("sickroomType",registerData.sickroomType)
 
 
     //##################################################################################################################
@@ -58,23 +59,53 @@ const CareRender03 = ({ registerData, setData }: CareRender00Props) => {
                     <ul className="radioSelect">
                         <li className="radioSelect__box">
                             {/* <!-- 팝업에 나오는 이미지는 id 값과 동일합니다. --> */}
-                            <input type="radio" id="sickRoom01" name="sickRoom" />
+                            <input 
+                                type="radio" 
+                                id="sickRoom01" 
+                                name="sickRoom" 
+                                checked={registerData.sickroomType === 1}
+                                onChange={()=> setData({sickroomType: 1})}    
+                            />
                             <label htmlFor="sickRoom01">일반실</label>
                         </li>
                         <li className="radioSelect__box">
-                            <input type="radio" id="sickRoom02" name="sickRoom" />
+                            <input 
+                                type="radio" 
+                                id="sickRoom02" 
+                                name="sickRoom" 
+                                checked={registerData.sickroomType === 2}
+                                onChange={()=> setData({sickroomType: 2})}        
+                            />
                             <label htmlFor="sickRoom02">응급실</label>
                         </li>
                         <li className="radioSelect__box">
-                            <input type="radio" id="sickRoom03" name="sickRoom" />
+                            <input 
+                                type="radio" 
+                                id="sickRoom03" 
+                                name="sickRoom" 
+                                checked={registerData.sickroomType === 3}
+                                onChange={()=> setData({sickroomType: 3})}        
+                            />
                             <label htmlFor="sickRoom03">중환자실</label>
                         </li>
                         <li className="radioSelect__box">
-                            <input type="radio" id="sickRoom04" name="sickRoom" />
+                            <input 
+                                type="radio" 
+                                id="sickRoom04" 
+                                name="sickRoom" 
+                                checked={registerData.sickroomType === 4}
+                                onChange={()=> setData({sickroomType: 4})}        
+                            />
                             <label htmlFor="sickRoom04">격리병실</label>
                         </li>
                         <li className="radioSelect__box">
-                            <input type="radio" id="sickRoom05" name="sickRoom" />
+                            <input 
+                                type="radio" 
+                                id="sickRoom05" 
+                                name="sickRoom" 
+                                checked={registerData.sickroomType === 5}
+                                onChange={()=> setData({sickroomType: 5})}        
+                            />
                             <label htmlFor="sickRoom05">폐쇄병실</label>
                         </li>
                     </ul>
@@ -82,7 +113,7 @@ const CareRender03 = ({ registerData, setData }: CareRender00Props) => {
                         type="button" 
                         className="select__list--help"
                         onClick={()=> 
-                            dispatch(showPopup({element:ExplanationRoomPopup,type:"bottomPopup",actionType:"careHelpInfo00"}))
+                            dispatch(showPopup({element:ExplanationRoomPopup,type:"bottomPopup",actionType:"careHelpInfo00",action:popupAction}))
                         }    
                     >
                         설명이 필요하다면 눌러주세요!
