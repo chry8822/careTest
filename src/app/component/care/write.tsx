@@ -250,6 +250,24 @@ const CareWrite = () => {
         return checkMsg;
     }
 
+    
+    /**
+     * Validation Check  (환자 감연성 질환 정보 입력)
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+    // 감염성 질환 수정해야됨
+     const infectiousCheckValidationMsg = () => {
+
+        const {infectiousDiseaseEtc,infectiousDisease } = detailPlaceType === "edit" ? editData : careData;
+        let checkMsg:string ="";
+        if(infectiousDisease === 64 || 0) {
+            checkMsg = "감염성 질환을 선택해주세요."
+        }else if((infectiousDisease & 32) > 0 && Utils.isEmpty(infectiousDiseaseEtc)) {
+            checkMsg = "감염성 질환 기타 사유를 입력해주세요.";
+        }
+
+        return checkMsg;
+    }
 
         /**
      * 금칙어 Check
@@ -317,9 +335,9 @@ const CareWrite = () => {
         } else if(step === 2) {
             validationCheckMsg = inputCheckValidationMsg()
         } else if(step === 3) {
-            
+
         } else if(step === 4) {
-            
+            validationCheckMsg = infectiousCheckValidationMsg()
         } else if(step === 5) {
             
         } else if(step === 6) {

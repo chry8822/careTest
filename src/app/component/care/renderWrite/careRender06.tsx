@@ -17,19 +17,23 @@ const CareRender06 = ({ registerData, setData }: CareRender00Props) => {
 
     const changeCheckbox = (position:any) => {
         let { cognitive, cognitiveDeliriumEtc, cognitiveDementiaEtc   } = registerData;
-
         let power = Math.pow(2, position -1);
+    
+        if(position === 1){
+            cognitive = cognitive + (!((cognitive & 1) > 0) ? power : -power)
+        }
+        if(position === 2){
+            cognitive = cognitive + (!((cognitive & 2) > 0) ? power : -power)
+        }
+
 
         setData({
             cognitive: position > 0 ? cognitive : 0,
-            cognitiveDementiaEtc: ((cognitive & 1) > 0) ? cognitive = cognitive + ((cognitive & 1) > 0? power : -power) : "" ,
-            cognitiveDeliriumEtc :((cognitive & 2) > 0) ? cognitive = cognitive + ((cognitive & 2) > 0? power : -power) : "" ,
+            cognitiveDementiaEtc : position === 0 ? "" : (cognitive & 1) > 0 ? cognitiveDementiaEtc : "",
+            cognitiveDeliriumEtc : position === 0 ? "" : (cognitive & 2) > 0 ? cognitiveDeliriumEtc : ""
         })
+
     }
-
-
-
-
     //##################################################################################################################
     //##
     //## >> Method : Popup
@@ -58,7 +62,7 @@ const CareRender06 = ({ registerData, setData }: CareRender00Props) => {
                 <div className="select__list breakLine">
                     <div className="select__list--totalTit">
                         <h3 className="txtStyle03-txtBrown">환자 상세 정보 입력</h3>
-                        <span>3/7</span>
+                        <span>4/7</span>
                     </div>
                     <div className="select__list--detailTit">
                         <div>
@@ -111,28 +115,45 @@ const CareRender06 = ({ registerData, setData }: CareRender00Props) => {
                         <em>(중복 선택 가능)</em>
                     </div>
                     <ul className="checkSelect">
-                        <li className="checkSelect__box active">
+                        <li className={`checkSelect__box ${(registerData.cognitive & 1) > 0 && " active"} `}>
                             <input 
                                 type="checkbox" 
                                 id="recognition01" 
                                 name="recognition" 
-
+                                checked={(registerData.cognitive & 1) > 0}
+                                onClick={()=>{
+                                    changeCheckbox(1)
+                                }}
                             />
                             <label htmlFor="recognition01">치매</label>
                             <textarea
                                 placeholder="환자의 치매와 관련하여 참고해야 하는 것이 있다면 입력해주세요.(선택)"
+                                value={registerData.cognitiveDementiaEtc || ""}
+                                autoComplete="off"
+                                onChange={(e) => setData({
+                                    cognitiveDementiaEtc: e.target.value
+                                })}
                             ></textarea>
                         </li>
-                        <li className="checkSelect__box active">
+                        <li className={`checkSelect__box ${(registerData.cognitive & 2) > 0 && " active"} `}>
+
                             <input 
                                 type="checkbox" 
                                 id="recognition02" 
                                 name="recognition" 
-                                
+                                checked={(registerData.cognitive & 2) > 0}
+                                onClick={()=>{
+                                    changeCheckbox(2)
+                                }}
                             />
                             <label htmlFor="recognition02">섬망</label>
                             <textarea
                                 placeholder="환자의 섬망과 관련하여 참고해야 하는 것이 있다면 입력해주세요.(선택)"
+                                value={registerData.cognitiveDeliriumEtc || ""}
+                                autoComplete="off"
+                                onChange={(e) => setData({
+                                    cognitiveDeliriumEtc: e.target.value
+                                })}
                             ></textarea>
                         </li>
                         <li className="checkSelect__box">
@@ -140,7 +161,10 @@ const CareRender06 = ({ registerData, setData }: CareRender00Props) => {
                                 type="checkbox" 
                                 id="infectious03" 
                                 name="recognition" 
-
+                                checked={registerData.cognitive === 0}
+                                onClick={()=>{
+                                    changeCheckbox(0)
+                                }}
                             />
                             <label htmlFor="infectious03">없음</label>
                         </li>
@@ -177,7 +201,7 @@ const CareRender06 = ({ registerData, setData }: CareRender00Props) => {
                             <label htmlFor="sleep01">네</label>
                             <textarea
                                 placeholder="환자의 수면장애와 관련하여 참고해야 하는 것이 있다면 입력해주세요.(선택)"
-                                value={registerData.somnipathy}
+                                value={registerData.somnipathyEtc}
                                 autoComplete="off"
                                 onChange={(e) => {
                                     setData({ somnipathyEtc: e.target.value })

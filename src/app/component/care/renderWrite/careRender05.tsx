@@ -119,7 +119,7 @@ const CareRender05 = ({ registerData, setData }: CareRender00Props) => {
                 <div className="select__list breakLine">
                     <div className="select__list--totalTit">
                         <h3 className="txtStyle03-txtBrown">환자 상세 정보 입력</h3>
-                        <span>2/7</span>
+                        <span>3/7</span>
                     </div>
                     <div className="select__list--detailTit">
                         <div>

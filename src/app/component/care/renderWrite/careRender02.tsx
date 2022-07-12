@@ -51,7 +51,9 @@ const CareRender02 = ({ registerData, setData }: CareRender00Props) => {
                         <li className="basicInput__txt">
                             <label htmlFor="name">이름</label>
                             <div className="basicInput__txt--form">
-                                <div className="inputWrap__box">
+                                <div className={
+                                    `inputWrap__box ${registerData.name && Utils.notHangulCheck(registerData.name) && " wrong"}`}
+                                >
                                     <input 
                                         type="text" 
                                         id="name" 
@@ -75,7 +77,7 @@ const CareRender02 = ({ registerData, setData }: CareRender00Props) => {
                             </div>
                             {
                                 registerData.name && Utils.notHangulCheck(registerData.name) ? 
-                                <em>asdf</em> :
+                                <em>한글만 입력하실 수 있습니다.</em> :
                                 ""
                             }
                         </li>
@@ -107,7 +109,9 @@ const CareRender02 = ({ registerData, setData }: CareRender00Props) => {
                         <li className="basicInput__txt">
                             <label htmlFor="age">나이</label>
                             <div className="basicInput__txt--form">
-                                <div className="inputWrap__box">
+                               <div className={
+                                    `inputWrap__box ${registerData.age && !Utils.isNumber(registerData.age) && " wrong"}`}
+                                >
                                     <input 
                                         type="text" 
                                         id="age" 
@@ -130,11 +134,18 @@ const CareRender02 = ({ registerData, setData }: CareRender00Props) => {
                                 </div>
                                 <small className="basicInput__txt--label">세</small>
                             </div>
+                                {
+                                    registerData.age && !Utils.isNumber(registerData.age) ? 
+                                    <em>숫자만 입력하실 수 있습니다.</em> :
+                                    ""
+                                }
                         </li>
                         <li className="basicInput__txt">
                             <label htmlFor="height">키</label>
                             <div className="basicInput__txt--form">
-                                <div className="inputWrap__box">
+                                <div className={
+                                        `inputWrap__box ${registerData.height && !Utils.isNumber(registerData.height) && " wrong"}`}
+                                >
                                     <input 
                                         type="text" 
                                         id="height" 
@@ -156,11 +167,18 @@ const CareRender02 = ({ registerData, setData }: CareRender00Props) => {
                                 </div>
                                 <small className="basicInput__txt--label">cm</small>
                             </div>
+                                {
+                                    registerData.height && !Utils.isNumber(registerData.height) ? 
+                                    <em>숫자만 입력하실 수 있습니다.</em> :
+                                    ""
+                                }
                         </li>
                         <li className="basicInput__txt">
                             <label htmlFor="weight">몸무게</label>
                             <div className="basicInput__txt--form">
-                                <div className="inputWrap__box">
+                                <div className={
+                                    `inputWrap__box ${registerData.weight && !Utils.isNumber(registerData.weight) && " wrong"}`}
+                                >
                                     <input 
                                         type="text" 
                                         id="weight" 
@@ -181,6 +199,11 @@ const CareRender02 = ({ registerData, setData }: CareRender00Props) => {
                                 </div>
                                 <small className="basicInput__txt--label">kg</small>
                             </div>
+                            {
+                                registerData.weight && !Utils.isNumber(registerData.weight) ? 
+                                <em>숫자만 입력하실 수 있습니다.</em> :
+                                ""
+                            }
                         </li>
                         <li className="basicInput__txt">
                             <label htmlFor="diagnosis">진단명</label>
