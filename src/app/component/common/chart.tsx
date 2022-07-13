@@ -26,8 +26,6 @@ const Piechart = ({graph}:PieChartProps) => {
         }        
     },[graph.data,graph.backgroundColor])
 
-  
-    console.log(graphData.backgroundColor[0])
 
     const chartData = [
         {

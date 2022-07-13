@@ -14,6 +14,13 @@ interface CareRender00Props {
 const CareRender04 = ({ registerData, setData }: CareRender00Props) => {
     const dispatch = useDispatch()
 
+    /**
+     * CheckBox Data 변경 (감염성 질환)
+     * -----------------------------------------------------------------------------------------------------------------
+     *
+     * @param position : checkBox Position
+     */
+
     const changeCheckbox = (position: number) => {
         let { infectiousDisease, infectiousDiseaseEtc } = registerData;
         const diseaseCheckArr = [

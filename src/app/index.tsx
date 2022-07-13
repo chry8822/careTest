@@ -10,7 +10,8 @@ import {
     CareExtend,
     CarePlace,
     CareRender,
-    CareWrite
+    CareWrite,
+    CareDetail
 } from "./component";
 import Popup from './container/popup/popup';
 
@@ -35,6 +36,11 @@ const Root: React.FC  = ()=> {
                             <Route path="write">
                                 <Route path=":type/:step/:time/:place" element={<CareWrite/>}/>
                                 <Route path=":type/:step/:time/:place/:familyId" element={<CareWrite/>}/>
+                            </Route>
+                            <Route path="detail">
+                                <Route path=":type/:time/:place" element={<CareDetail/>}/>
+                                <Route path=":type/:time/:place/:familyId" element={<CareDetail/>}/>
+                                <Route path=":type/:time/:place/:familyId/:jobId" element={<CareDetail/>}/>
                             </Route>
                         </Route>
                       </Routes>

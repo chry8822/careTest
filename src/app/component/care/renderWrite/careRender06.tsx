@@ -15,6 +15,13 @@ const CareRender06 = ({ registerData, setData }: CareRender00Props) => {
 
     const dispatch = useDispatch()
 
+    /**
+     * CheckBox Data 변경 (의식/인지 장애)
+     * -----------------------------------------------------------------------------------------------------------------
+     *
+     * @param position : checkBox Position
+     */
+
     const changeCheckbox = (position:any) => {
         let { cognitive, cognitiveDeliriumEtc, cognitiveDementiaEtc   } = registerData;
         let power = Math.pow(2, position -1);

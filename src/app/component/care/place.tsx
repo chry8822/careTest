@@ -45,15 +45,13 @@ const CarePlace = () => {
         guCode: ""
     });
 
-
-    console.log(selectCarePlace.detail)
     //##################################################################################################################
     //##
     //## >> Override
     //##
     //##################################################################################################################
 
-    console.log("디테일",selectCarePlace.detail)
+
     useEffect(() => {
         window.scrollTo(0, 0);
 
@@ -69,6 +67,8 @@ const CarePlace = () => {
         // getCarePlace();
 
     }, []);
+
+    console.log("carePlaceList",carePlaceList[0])
 
         /**
      * 장소를 선택하고 기타 상세 주소를 입력 시 호출
@@ -318,6 +318,7 @@ const CarePlace = () => {
             siCode: carePlaceList[idx].si_code,
             guCode: carePlaceList[idx].gu_code
         };
+        console.log("selectPlace",selectPlace)
         setSelectCarePlace({
             ...selectPlace
         });
@@ -366,7 +367,6 @@ const CarePlace = () => {
      * Set Map
      * -----------------------------------------------------------------------------------------------------------------
      */
-      const mapRef = useRef<any>()
       const setMap = () => {
          if (selectCarePlace.lat === 0 || selectCarePlace.lon === 0) {
              return;
@@ -438,7 +438,6 @@ const CarePlace = () => {
 
                         setCarePlaceList(list);
                         setSearchMessage("등록되지 않은 병,의원입니다.");
-
                         //### 총 페이지 구하기
                         totalPage = Math.ceil(mData.hospitals.total / limit);
                     } else {

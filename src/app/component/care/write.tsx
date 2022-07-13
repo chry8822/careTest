@@ -32,6 +32,7 @@ const CareWrite = () => {
     const [requestType] = useState<string>(getParam.place || "");           //## 간병장소 (hospital / home)
     const [familyId] = useState<number>(Number(getParam.familyId) || 0);    //## 선택한 가족 ID
     const [jobType] = useState<string>(getParam.time || "");                //## 시간기간제, 기간제 확인 변수
+    const [jobId] = useState<number>(Number(getParam.jobId) || 0);          //## 수정 중인 공고 ID
 
 
     //##################################################################################################################
@@ -132,33 +133,14 @@ const CareWrite = () => {
         }
     };
 
-    console.log("careData",careData.selectOption)
+
+
+
 
     /**
-     * Validation Check  (코로나 검사 유무)
+     * Validation Check  (코로나 검사 유/무)
      * -----------------------------------------------------------------------------------------------------------------
      */
-    // const coronaValidationCheck = () => {
-    //     const { coronaCheck } = detailPlaceType === "edit" ? editData : careData;
-    //     let checkMsg: string = "";
-
-    //     if (coronaCheck === 0) {
-    //         checkMsg = "코로나 검사 유무를 선택해주세요";
-    //     }
-    //     return checkMsg;
-    // }
-
-    // const validation = {
-    //     coronaCheck : function() {
-    //         const { coronaCheck } = detailPlaceType === "edit" ? editData : careData;
-    //         let checkMsg: string = "";
-    
-    //         if (coronaCheck === 0) {
-    //             checkMsg = "코로나 검사 유무를 선택해주세요";
-    //         }
-    //         return checkMsg;
-    //     }
-    // }
 
     const coronaValidationCheck = () => {
         const { coronaCheck } = detailPlaceType === "edit" ? editData : careData;
@@ -214,7 +196,7 @@ const CareWrite = () => {
      * -----------------------------------------------------------------------------------------------------------------
      */
 
-    const inputCheckValidationMsg = () => {
+    const patientInfoValidationMsg = () => {
 
         const {name, gender, age, height, weight, diagnosis} = detailPlaceType === "edit" ? editData : careData;
         let checkMsg:string ="";
@@ -250,14 +232,27 @@ const CareWrite = () => {
         return checkMsg;
     }
 
-    
+
     /**
-     * Validation Check  (환자 감연성 질환 정보 입력)
+     * Validation Check  (환자 병신 선택)
      * -----------------------------------------------------------------------------------------------------------------
      */
-    // 감염성 질환 수정해야됨
-     const infectiousCheckValidationMsg = () => {
 
+    const sickRoomValidationMsg = () => {
+        const{ sickroomType } = detailPlaceType === "edit" ? editData : careData;
+        let checkMsg:string ="";
+        if(sickroomType < 0) {
+            checkMsg = "환자의 병실을 선택해주세요."
+        }
+        return checkMsg;
+    }
+
+    
+    /**
+     * Validation Check  (감염성 질환 정보 입력)
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+     const infectiousCheckValidationMsg = () => {
         const {infectiousDiseaseEtc,infectiousDisease } = detailPlaceType === "edit" ? editData : careData;
         let checkMsg:string ="";
         if(infectiousDisease === 64 || 0) {
@@ -269,7 +264,119 @@ const CareWrite = () => {
         return checkMsg;
     }
 
-        /**
+    /**
+     * Validation Check  (마비/ 거동 상태 정보)
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    const behaviorCheckValidationMsg = () => {
+        const {move, paralysis, changePosture } = detailPlaceType === "edit" ? editData : careData;
+        let checkMsg:string ="";
+        if(paralysis < 0) {
+            checkMsg = "마비 상태를 선택해주세요."
+        }else if(move < 0) {
+            checkMsg = "거동 기능 상태를 선택해주세요."
+        }else if(changePosture < 0) {
+            checkMsg = "욕창 유/무를 선택해주세요."
+        }
+
+        return checkMsg;
+    }
+
+    /**
+     * Validation Check  (의식/ 인지장애 상태 정보)
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+        const cognitiveCheckValidationMsg = () => {
+        const {consciousness ,cognitive,somnipathy } = detailPlaceType === "edit" ? editData : careData;
+        let checkMsg:string ="";
+        if(consciousness < 0) {
+            checkMsg = "의식 상태를 선택해주세요."
+        }else if(cognitive === 4){
+            checkMsg = "인지장애를 선택해주세요."
+        }else if(somnipathy < 0){
+            checkMsg = "수면장애 유/무를 선택해주세요."
+        }
+
+        return checkMsg;
+    }
+    console.log(careData.cognitive)
+
+
+    
+    /**
+     * Validation Check  (화장실 이동/ 배변도구 및 장루 상태 정보)
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+     const toiletCheckValidationMsg = () => {
+        let {moveToilet, toiletType, stoma }= detailPlaceType === "edit" ? editData : careData;
+        let checkMsg:string ="";
+        if(moveToilet < 0) {
+            checkMsg = "화장실 이용 유/무를 선택해주세요."
+        }else if(toiletType === 4){
+            checkMsg = "배변도구를 선택해주세요."
+        }else if(stoma < 0){
+            checkMsg = "장루설치 유/무를 선택해주세요."
+        }
+
+        return checkMsg;
+    }
+    console.log(careData.cognitive)
+
+
+        
+    /**
+     * Validation Check  (화장실 이동/ 배변도구 및 장루 상태 정보)
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+     const eatConditionCheckValidationMsg = () => {
+        let {eat, suction, feeding }= detailPlaceType === "edit" ? editData : careData;
+        let checkMsg:string ="";
+        if(eat < 0) {
+            checkMsg = "식사 가능 상태를 선택해주세요."
+        }else if(suction < 0){
+            checkMsg = "석션 사용 유/무 선택해주세요."
+        }else if(feeding < 0){
+            checkMsg = "피딩 사용 유/무를 선택해주세요."
+        }
+
+        return checkMsg;
+    }
+    console.log(careData.cognitive)
+
+
+    /**
+     * Validation Check  (화장실 이동/ 배변도구 및 장루 상태 정보)
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+         const rehabilitateCheckValidationMsg = () => {
+            let {rehabilitate, dialysis, favoriteGender, isWantUniform }= detailPlaceType === "edit" ? editData : careData;
+            let checkMsg:string ="";
+            if(rehabilitate < 0) {
+                checkMsg = "재활 유/무 선택해주세요."
+            }else if(dialysis < 0){
+                checkMsg = "투석 유/무 선택해주세요."
+            }else if(favoriteGender < 0){
+                checkMsg = "우대하는 케어메이트 성별을 선택해주세요."
+            }else if(Utils.isEmpty(isWantUniform)){
+                checkMsg = "선호하는 케어메이트 복장을 선택해주세요."
+            }
+    
+            return checkMsg;
+        }
+        console.log(careData.cognitive)
+    
+
+
+
+
+
+
+    /**
      * 금칙어 Check
      * -----------------------------------------------------------------------------------------------------------------
      *
@@ -329,25 +436,25 @@ const CareWrite = () => {
     const moveNextStep = () => {
         // new Funtion 으로 대체 안됨 ( 대체시 호출하는 함수를 찾지 못함 )
         if(step === 0){
-            validationCheckMsg = coronaValidationCheck()
+            validationCheckMsg = coronaValidationCheck();
         } else if(step === 1) {
-            validationCheckMsg = careTimeValidationCheck()
+            validationCheckMsg = careTimeValidationCheck();
         } else if(step === 2) {
-            validationCheckMsg = inputCheckValidationMsg()
+            validationCheckMsg = patientInfoValidationMsg();
         } else if(step === 3) {
-
+            validationCheckMsg = sickRoomValidationMsg();
         } else if(step === 4) {
-            validationCheckMsg = infectiousCheckValidationMsg()
+            validationCheckMsg = infectiousCheckValidationMsg();
         } else if(step === 5) {
-            
+            validationCheckMsg = behaviorCheckValidationMsg();
         } else if(step === 6) {
-            
+            validationCheckMsg = cognitiveCheckValidationMsg();
         } else if(step === 7) {
-            
+            validationCheckMsg = toiletCheckValidationMsg();
         } else if(step === 8) {
-            
+            validationCheckMsg = eatConditionCheckValidationMsg();
         } else if(step === 9) {
-            
+            validationCheckMsg = rehabilitateCheckValidationMsg();
         }
 
         if (validationCheckMsg) {
@@ -428,11 +535,18 @@ const CareWrite = () => {
                 ...editData
             }));
         }
-        let moveStep: number;
-        moveStep = (requestType === "home" && step === 2) ? step + 2 : step + 1;
-        console.log("moveStep",moveStep)
-        setStep(moveStep);
-        navigate(`/care/write/register/${moveStep}/${jobType}/${requestType}/${familyId}`, {replace: true})
+
+        if(step ===9){
+            let paramType: string = jobId > 0 ? "edit" : "register";
+            navigate(`/care/detail/${paramType}/${jobType}/${requestType}/${familyId}/${jobId}`);
+        } else {
+            let moveStep: number;
+            moveStep = (requestType === "home" && step === 2) ? step + 2 : step + 1;
+            setStep(moveStep);
+            navigate(`/care/write/register/${moveStep}/${jobType}/${requestType}/${familyId}`, {replace: true})
+        }
+
+
     }
 
     console.log("step",step)
