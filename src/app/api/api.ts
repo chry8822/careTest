@@ -263,6 +263,31 @@ export function getRSAPublicKey() {
     })
 }
 
+/**
+ * 가족 리스트 가져오기
+ * -----------------------------------------------------------------------------------------------------------------
+ */
+
+export function patientList () {
+    return new Promise((resolve, reject) => {
+        axios({
+            method: "get",
+            url: baseApi(apiCarePrefix) + PATIENTS,
+            headers : {
+                'UserType': 'protector',
+                'Content-Type': 'application/json',
+                'UserAgent': SERVER_TYPE ? SERVER_TYPE : "",
+                'Authorization': auth
+            }
+        }).then((response) => {
+            successStatusCheck(response, resolve)
+        }).catch(err => {
+            failStatusCheck(err, reject)
+        });
+    })
+}
+
+
 
 /**
  * 가족 정보 상세 가져오기
@@ -414,5 +439,5 @@ export function jobGraph(params:any) {
     })
 }
 
-export default {lowestPriceList, mainList,login,addressList,hospitalListNew,getRSAPublicKey,patientDetail,badwordsCheck,userInfo,careDetail,jobGraph } 
+export default {lowestPriceList, mainList,login,addressList,hospitalListNew,getRSAPublicKey,patientDetail,badwordsCheck,userInfo,careDetail,jobGraph,patientList } 
 

@@ -88,6 +88,29 @@ const CareWrite = () => {
         // }
     }, []);
 
+
+    /**
+     * 공고 등록 데이터 변경 시 호출
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+         useEffect(() => {
+            if (step === 1) {
+                //### 간병 기간 수정 시 유효성 검사 체크
+                careTimeValidationCheck();
+            }
+            if (detailPlaceType === "register") {
+                let jobj: any = {
+                    ...careData,
+                    // detailType: detailType,
+                    jobType: jobType,
+                    requestType: requestType,
+                    familyId: familyId,
+                    step: step
+                };
+                LocalStorage.setStorage(LocalStorage.LOAD_WRITE_DATA, JSON.stringify(jobj));
+            }
+        }, [careData]);
+
     //##################################################################################################################
     //##
     //## >> Method : Popup

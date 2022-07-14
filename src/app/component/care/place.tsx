@@ -8,6 +8,8 @@ import Popup from "../common/popup";
 import {hidePopup, showPopup} from "../../redux/actions/popup/popup";
 import * as Utils from '../../constants/utils'
 import CarePlaceDetailPopup from './popup/placeDetail';
+import {setCare} from "../../redux/actions/care/care";
+
 
 const ADDRESS_API_KEY = `U01TX0FVVEgyMDIxMDEyODExMTIxODExMDc1MTU=`;
 
@@ -29,6 +31,7 @@ const CarePlace = () => {
     const [ placeType ] = useState<string>(getParam.place || "")
     const [ scrollFlag, setScrollFlag ] = useState(false)
     const [ carePlaceList, setCarePlaceList ] = useState<any[]>([]);
+    const [ familyId ] = useState<number>(Number(getParam.familyId) || 0);    //## 선택한 가족 Id
     const [ searchText, setSearchText] = useState<string>("");               //## 장소 검색 Input Text
     const [ searchMessage, setSearchMessage] = useState<string>("");         //## 장소 검색 후 검색 결과 없을 시 메시지
     const [ selectCarePlace, setSelectCarePlace] = useState({               //## 선택 한 장소 데이터
@@ -356,12 +359,15 @@ const CarePlace = () => {
 
 
     const confirmCarePlace = () => {
+        dispatch(setCare({
+            ...selectCarePlace
+        }));
         if(detailPlaceType === "register") {
-            navigate(`/care/write/register/0/${extendType}/${placeType}`)
+            navigate(`/care/write/register/0/${extendType}/${placeType}/${familyId}`)
         }
     }
 
-
+console.log("selectCarePlace",selectCarePlace)
 
      /**
      * Set Map

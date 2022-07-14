@@ -485,6 +485,20 @@ const Main = () => {
         dispatch(hidePopup());
         if(type === "login"){
             navigate("/care/login")
+        }else if (type === "new") { //## 공고 불러오기 팝업 - 새로 등록
+            LocalStorage.remove(LocalStorage.LOAD_WRITE_DATA);
+
+            if (mainData.patientsCnt === 0) {
+                navigate("/care/select");
+            } else {
+                navigate("/care/family/list");
+            }
+        } else if (type === "load") { //## 공고 불러오기 팝업 - 불러오기
+            const tempLoadWriteData = LocalStorage.getStorage(LocalStorage.LOAD_WRITE_DATA);
+            if (tempLoadWriteData) {
+                let loadWriteData = JSON.parse(tempLoadWriteData);
+                navigate(`/care/write/register/${loadWriteData.step}/${loadWriteData.jobType}/${loadWriteData.requestType}/${loadWriteData.familyId}`);
+            }
         }
     }
 

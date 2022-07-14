@@ -20,8 +20,10 @@ const LoadWritePopup = () => {
 
     return (
         <div className="popupWrap">
-            <div className="popupWrap__tit load">
-                <img src="/img/popupLoad.svg" alt="공고 불러오기 이미지" aria-hidden onError={Utils.imgSrcError}/>
+                <figure className="popupWrap__imgTop">
+                    <img src="/images/getAnnouncements.svg" alt="공고 불러오기 이미지" aria-hidden onError={Utils.imgSrcError}/>
+                </figure>
+                <div className="popupWrap__tit">
                 <h2>
                     <mark>작성중인 신청서가 있습니다.</mark>
                     <br/>
@@ -31,10 +33,10 @@ const LoadWritePopup = () => {
                     새로 등록하시면<br/>
                     임시저장된 공고는 삭제됩니다!
                 </p>
-            </div>
-            <div className="buttonWrap">
-                <button type="button" className="outlineTxtBtn" onClick={() => popup.action("new")}>새로 등록</button>
-                <button type="button" className="solidBtn" onClick={() => popup.action(popup.actionType)}>불러오기</button>
+                </div>
+            <div className="btnWrap">
+                <button type="button" className="btnBorder" onClick={() => popup.action("new")}>새로 등록</button>
+                <button type="button" className="btnColor" onClick={() => popup.action(popup.actionType)}>불러오기</button>
             </div>
         </div>
     );

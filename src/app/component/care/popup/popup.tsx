@@ -8,6 +8,8 @@ import * as Utils from '../../../constants/utils'
 import * as LocalStorage from '../../../constants/localStorage';
 import { useNavigate } from 'react-router-dom';
 
+
+
 const ExtendTypePopup = () => {
 
     const dispatch = useDispatch();
@@ -75,34 +77,7 @@ const ExtendTypePopup = () => {
 
 
     const serviceSelect = () => { //선택 결과 팝업에서 다음 클릭 시 선택한 데이터를 쿼리로 전달해서 해당 컴포넌트로 이동
-        dispatch(hidePopup())
-
-        if(extendType) {
-            console.log("ddd")
-            let jobType = extendType === "timeCare01" ? "time" : "day";
-            let requestType = placeType === "placeCare01" ? "hospital" : "home";
-            
-            if(jobType === "day") { //# 기간제 
-                if(requestType === "hopital"){ //# 병원
-                    Utils.adjustEvent("i3skha");
-                    Utils.analyticsEvent("care_dhos_st");
-                } else {                       //# 집
-                    Utils.adjustEvent("pasc1c");
-                    Utils.analyticsEvent("care_dhom_st");
-                }
-            }else {
-                if (requestType === "hospital") { //# 병원
-                    Utils.adjustEvent("f4ga1y");
-                    Utils.analyticsEvent("care_thos_st");
-                } else {                          //# 집
-                    Utils.adjustEvent("qyrh0o");
-                    Utils.analyticsEvent("care_thom_st");
-                }
-            }
-
-            navigate(`/care/place/register/${jobType}/${requestType}`);
-        }
-
+        
     }
     
     //##################################################################################################################
@@ -121,7 +96,9 @@ const ExtendTypePopup = () => {
                         <button 
                             type="button" 
                             className="close"
-                            onClick={() => popup.action("hide")}    
+                            onClick={() => 
+                                dispatch(hidePopup())
+                            }    
                         >닫기</button>
                     </section>
                     <section className="bottomPopup__detail">
@@ -172,7 +149,7 @@ const ExtendTypePopup = () => {
                                 <button 
                                     type="button" 
                                     className="btnColor"
-                                    onClick={() => serviceSelect()}        
+                                    onClick={() => popup.action(popup.actionType) }      
                                 >다음</button>
                             </div>
                         </div>

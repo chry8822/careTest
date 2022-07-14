@@ -1,4 +1,4 @@
-import React,{ useState, useEffect } from 'react';
+import React,{ useState, useEffect, useMemo } from 'react';
 import Header from '../common/header';
 import moment from 'moment'
 import {useLocation, useNavigate, useParams, createSearchParams} from "react-router-dom";
@@ -11,12 +11,20 @@ import { showPopup, hidePopup } from '../../redux/actions/popup/popup';
 import {setCare} from "../../redux/actions/care/care";
 import Api from '../../api/api'
 import * as LocalStorage from '../../constants/localStorage'
+import * as CareUtils from '../care/common/careUtils'
 import SocketIO from "../../constants/socket";
-
+import RenderDayCalendar from './render/dayCareCalendar'
+import * as HelpInfo from '../../component/care/popup/helpInfo'
 
 let phone: string = "";
 let userId: string = "";
 let snsLoginType: string = "";
+
+interface HelpInfoType {
+    img: string;
+    title: string;
+    content: string;
+}
 
 const formatDate: string = "YYYY-MM-DD";
 const formatTime: string = "HH:mm";
@@ -24,13 +32,13 @@ const formatHourTime: string = "HH:00";
 
 let socket: SocketIO;
 const CareDetail = () => {
-    
-    
+
     //### Query String
     const queryString = require('query-string');
     const parsed = queryString.parse(location.search);
-
+    
     const careData: CareType = useSelector((state: RootState) => state.care); //## 공고 등록 스토어 데이터
+    // console.log(careData.sickroomType)
 
     const getParam = useParams();
     const navigate = useNavigate();
@@ -116,9 +124,11 @@ const CareDetail = () => {
         relayPtrJobId: 0,   //## 간병 연장 대상 공고 Id
         insurance: null
     });
+    const [calrendarDateFlag, setCalrendarDateFlag] = useState<any>({
+        preFlag: false,
+        nextFlag: false
+    }) 
 
-    console.log(parsed.reFleg)
-   
     //##################################################################################################################
     //##
     //## >> Override
@@ -147,17 +157,17 @@ const CareDetail = () => {
                     Utils.analyticsEvent("care_thom_sm");
                 }
             }
-            careDetailApi()
+
             userApi();
             let jobReCallFlag = LocalStorage.getStorage(LocalStorage.JOB_RE_CALL_FLAG);
-            if (reFlag && jobId > 0) {
-                if (jobReCallFlag === "on" && tabPosition === 0) {
-                    LocalStorage.setStorage(LocalStorage.JOB_RE_CALL_FLAG, "off");
-                    dispatch(showPopup({element:Popup, action:popupAction}));
-                    // dispatch(showPopup({CareCallPopup, popupAction}));
-                }
-                careDetailApi("reFlag");
-            }
+            // if (reFlag && jobId > 0) {
+            //     if (jobReCallFlag === "on" && tabPosition === 0) {
+            //         LocalStorage.setStorage(LocalStorage.JOB_RE_CALL_FLAG, "off");
+            //         dispatch(showPopup({element:Popup, action:popupAction}));
+            //         // dispatch(showPopup({CareCallPopup, popupAction}));
+            //     }
+            //     careDetailApi("reFlag");
+            // }
         } else if (detailType === "view" && jobId > 0) { //## 공고 상세
             careDetailApi();
         }
@@ -274,6 +284,7 @@ const CareDetail = () => {
         }
     }, [tabPosition]);
     
+    
     /**
      * 공고 데이터 수정 시 호출
      * -----------------------------------------------------------------------------------------------------------------
@@ -318,6 +329,15 @@ const CareDetail = () => {
         }
     };
 
+
+    /**
+     * 간병 달력 구분 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    const renderSelectCareCalrendar = () => {
+        
+    }
     //##################################################################################################################
     //##
     //## >> Method : Api
@@ -507,6 +527,230 @@ const CareDetail = () => {
         }
     };
 
+console.log("jobStatus.status",detailData.jobType)
+
+    
+    /**
+     * 간병 달력 구분 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+     const renderCareCalendar = () => {
+        const {jobType, startDate} = detailData;
+
+        return (
+                <>
+                    <div className="announcementTime__careType">
+                        <p className="txtStyle05">*간병유형은 수정할 수 없습니다.</p>
+                        <dl className="announcementTime__careType--detail">
+                            <dt>{jobType === "day" ? "기간" : "시간"}제 간병</dt>
+                            <dd>
+                                {
+                                    jobType === "day" ?
+                                        "24시간 이상의 간병이 필요해요."
+                                        :
+                                        "신청한 시간에만 간병하러 와주세요."
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+                    <div className="bubbleInfo">
+                        <p>달력에 표시된 날은 간병요청한 날입니다.</p>
+                    </div>
+                        {
+                            jobType === "day" ?
+                                <>
+                                    <div className="careCalWrap__list">
+                                        <RenderDayCalendar
+                                            curDate={curDate}
+                                            setCurDate={setCurDate}
+                                            jobData={detailData}
+                                            dateFlag={calrendarDateFlag}
+                                        />
+                                    </div>
+                                    <div className="careDay">
+                                        {
+                                            detailType !== "view" &&
+                                            <div className="leftModifyWrap">
+                                                <span className="modifyBtn">수정하기</span>
+                                            </div>
+                                        }
+                                        {renderTotalCareTime()}
+                                    </div>
+                                </>
+                                :
+                                <>
+                                    {
+                                        detailType !== "view" &&
+                                        <div className="leftModifyWrap">
+                                            <span className="modifyBtn">수정하기</span>
+                                        </div>
+                                    }
+                                    <div className="careCalWrap__list">
+                                        {/* <RenderTimeCalendar
+                                            curDate={moment(startDate)}
+                                            jobData={detailData}
+                                        /> */}
+                                    </div>
+                                    <div className="careTime">
+                                        {renderTotalCareTime()}
+                                    </div>
+                                </>
+                        }
+                </>
+        );
+    };
+
+    /**
+     * 공고 총 간병 시간 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+    const renderTotalCareTime = () => {
+        const {jobType, startDate, startTime, endDate, endTime} = detailData;
+        const dateStart: string = startDate + " " + startTime;
+        const dateEnd: string = endDate + " " + endTime;
+
+        return (
+            <dl className={"basicInfoSt" + (jobType === "day" ? " titSM" : "")}>
+                {
+                    jobType === "day" ?
+                        <>
+                        <div className="announcementTime__Info">
+                          <dl className="careListTxt">
+                            <div className='announcementTime__Info--start'>
+                                <dt>간병 시작 시간</dt>
+                                <dd>{moment(dateStart).format('YYYY년 MM월 DD일 HH시')}</dd>
+                            </div>
+                            <div className="announcementTime__Info--finish">
+                                <dt>간병 종료 시간</dt>
+                                <dd>{moment(dateEnd).format('YYYY년 MM월 DD일 HH시')}</dd>
+                            </div>
+                            <div className="announcementTime__Info--total">
+                                <dt>총 간병기간</dt>
+                                <dd>{CareUtils.careDayHour(dateStart, dateEnd, "detail")}</dd>
+                            </div>
+                          </dl>
+                        </div>
+                        </>
+                        :
+                        <div>
+                            <dt>해당 간병은 선택한 일에</dt>
+                            <dd><strong>{moment(dateStart).format("HH")}시</strong>부터 <strong>{startTime > endTime ? "다음날 " : ""} {moment(dateEnd).format("HH")}시</strong>까지 진행됩니다.</dd>
+                        </div>
+                }
+            </dl>
+        );
+    };
+
+
+    /**
+     * 감염성 질환 선택 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+
+    let { infectiousDisease, infectiousDiseaseEtc } = careData;
+    const diseaseCheckArr = [
+        infectiousDisease === 0,
+        (infectiousDisease & 1) > 0,
+        (infectiousDisease & 2) > 0,
+        (infectiousDisease & 4) > 0,
+        (infectiousDisease & 8) > 0,
+        (infectiousDisease & 16) > 0,
+        (infectiousDisease & 32) > 0,
+    ];
+
+
+    const renderInfectiousDiseaseSelect = useMemo(()=> {
+        let html:any[] = [];
+        diseaseCheckArr.forEach((item:any, idx:any) => {
+            if(diseaseCheckArr[idx + 1]) {
+                html.push(
+                    <li>
+                        <div className="announcementItem__list--detail">
+                            <figure>
+                                <button type="button">도움말 보기</button>
+                                <img src={HelpInfo.careHelpInfo01[idx].img}alt="코로나" />
+                            </figure>
+                            <div>
+                                <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo01[idx].title}</h4>
+                                <p className="txtStyle05-C333">
+                                {HelpInfo.careHelpInfo01[idx].content}
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                    )
+            }
+            })
+            return html
+    },[])
+
+    /**
+     * 마비 / 거동 / 욕창 선택 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    
+    
+    const renderMoveBodySelect = useMemo(() => {
+        let selectPosition01: number = careData.paralysis - 1;
+        let selectPosition02: number = careData.move === 1 ? 2 : careData.move === 2 ? 1 : 0;
+    
+        let html:any[] = [];
+        if(careData.paralysis > 0){
+            html.push(
+                <li>
+                    <div className="announcementItem__list--detail">
+                        <figure>
+                            <button type="button">도움말 보기</button>
+                            <img src={HelpInfo.careHelpInfo02[selectPosition01].img}alt="코로나" />
+                        </figure>
+                        <div>
+                            <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo02[selectPosition01].title}</h4>
+                            <p className="txtStyle05-C333">
+                            {HelpInfo.careHelpInfo02[selectPosition01].content}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+            )
+        }
+        if(careData.move > 0){
+            html.push(
+                <li>
+                    <div className="announcementItem__list--detail">
+                        <figure>
+                            <button type="button">도움말 보기</button>
+                            <img src={HelpInfo.careHelpInfo03[selectPosition02].img}alt="코로나" />
+                        </figure>
+                        <div>
+                            <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo03[selectPosition02].title}</h4>
+                            <p className="txtStyle05-C333">
+                            {HelpInfo.careHelpInfo03[selectPosition02].content}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+            )
+        }
+            html.push(
+                <li>
+                    <div className="announcementItem__list--detail">
+                        <figure>
+                            <button type="button">도움말 보기</button>
+                            <img src={HelpInfo.careHelpInfo04[careData.changePosture - 1].img}alt="코로나" />
+                        </figure>
+                        <div>
+                            <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo04[careData.changePosture - 1].title}</h4>
+                            <p className="txtStyle05-C333">
+                            {HelpInfo.careHelpInfo04[careData.changePosture - 1].content}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+            )
+        return html
+    },[])
 
 
     //##################################################################################################################
@@ -526,28 +770,50 @@ const CareDetail = () => {
             <main>
                 <div className="subWrap">
                     <div className="subWrap__flex">
-                        <ul role="tablist" className="headerTab">
-                            <li role="tab" className="active">간병 상세</li>
-                            <li role="tab" >지원한 케어메이트</li>
-                        </ul>
+                        {
+                            (detailType === "view" && jobStatus.status !== (9 || 10)) &&
+                            <ul role="tablist" className="headerTab">
+                                <li role="tab" className="active">간병 상세</li>
+                                <li role="tab" >지원한 케어메이트</li>
+                            </ul>
+                        }
                         {/* <!-- 위에 탭 없을 때에는 mt0 추가 --> */}
-                        <section role="tabpanel" className="announcementDetails">
+                        <section role="tabpanel" className={`announcementDetails ${detailType === "view" ? "" : "mt0"}`}>
                             <article className="commonWrap breakLine">
                                 <div className="announcementDetails__address">
-                                    {/* <div className="announcementAlert">
+                                {
+                                    (detailType === "view" && jobStatus.status !== (9 || 10)) && Utils.isEmpty(jobStatus.payment) &&
+                                    <div className="announcementAlert">
                                         <p>지원한 케어메이트가 있기 때문에 수정이 불가능합니다</p>
-                                        <button type="button">보기</button>
-                                    </div> */}
-                                    <div className="announcementTit home">
+                                        <button 
+                                            type="button"
+                                            onClick={()=>
+                                                dispatch(showPopup({element:Popup,action:popupAction,content:"이미 지원한 케어메이트가 있기 때문에<br/>해당 공고를 수정할 수 없습니다."}))
+                                            }    
+                                        >보기</button>
+                                    </div>
+                                }
+
+
+                                    <div className={`announcementTit ${careData.requestType === "home" ? " home" : " hospital"}`}>
                                         <h2 className="txtStyle03-txtBrown">간병 정보</h2>
                                     </div>
                                     <div className="map">
                                         <div className="map__wrap" id='map'></div>
-                                        <div className="zoom">zoom</div>
+                                        <div 
+                                            className="zoom"
+                                            onClick={()=>{}}
+                                        >zoom</div> 
                                     </div>
-                                    <div className="careNumber">
-                                        <h3 className="txtStyle04-W500">간병 번호 : HMC_0000000000</h3>
-                                    </div>
+                                    {
+                                        (jobId > 0 && !reFlag) &&
+                                        <div className="careNumber">
+                                            <h3 className="txtStyle04-W500">
+                                                간병 번호 : HMC_{jobId.toString().padStart(10, "0")}
+                                            </h3>
+                                        </div>
+                                    }
+
                                     <div className="announcementAdrees">
                                         <div className="leftModifyWrap">
                                             <span className="modifyBtn">수정하기</span>
@@ -555,107 +821,47 @@ const CareDetail = () => {
                                         <dl className="careListTxt">
                                             <div>
                                                 <dt>간병 장소</dt>
-                                                <dd>XXXXXXX XXX XXXXXXXXXXXXXXXXXX 병원</dd>
+                                                {
+                                                    Utils.isEmpty(careData.info) ? 
+                                                    <dd>&nbsp;</dd>
+                                                    :
+                                                    <dd>{careData.info + " " +careData.detail}</dd>
+                                                }
                                             </div>
                                             <div>
                                                 <dt>기타 상세정보</dt>
-                                                <dd>XXXXXXX XXX XXXXXXXXXXXXXXX</dd>
+                                                {
+                                                    Utils.isEmpty(careData.address) ? 
+                                                    <dd>&nbsp;</dd>
+                                                    :
+                                                    <dd>{careData.address}</dd>
+                                                }
                                             </div>
                                         </dl>
                                     </div>
                                 </div>
-                                <div className="announcementTime__careType">
-                                    <p className="txtStyle05">*간병유형은 수정할 수 없습니다.</p>
-                                    <dl className="announcementTime__careType--detail">
-                                        <dt>기간제 간병</dt>
-                                        <dd>24시간 이상의 간병이 필요해요.</dd>
-                                    </dl>
-                                </div>
-                                <div className="bubbleInfo">
-                                    <p>달력에 표시된 날은 간병요청한 날입니다.</p>
-                                </div>
-                                <div className="calendar">
-                                    <h3 className="a11y-hidden">달력</h3>
-                                    <div className="calendar__tit">
-                                        <button type="button" className="prev">이전달</button>
-                                        <h4 className="txtStyle03">2020. 06</h4>
-                                        <button type="button" className="next disabled">다음달</button>
-                                    </div>
-                                    <div className="calendar__head">
-                                        <span>일</span>
-                                        <span>월</span>
-                                        <span>화</span>
-                                        <span>수</span>
-                                        <span>목</span>
-                                        <span>금</span>
-                                        <span>토</span>
-                                    </div>
-                                    <div className="calendar__detail">
-                                        <div className="calendar__detail--col">
-                                            <span className="start ing">1</span>
-                                            <span className="ing">2</span>
-                                            <span className="ing">3</span>
-                                            <span className="ing">4</span>
-                                            <span className="ing">5</span>
-                                            <span className="ing">6</span>
-                                            <span className="ing sat">7</span>
-                                        </div>
-                                        <div className="calendar__detail--col">
-                                            <span className="sun ing">8</span>
-                                            <span className="ing">9</span>
-                                            <span className="ing">10</span>
-                                            <span className="ing">11</span>
-                                            <span className="ing">12</span>
-                                            <span className="ing">13</span>
-                                            <span className="finish ing">14</span>
-                                        </div>
-                                        <div className="calendar__detail--col">
-                                            <span>15</span>
-                                            <span>16</span>
-                                            <span>17</span>
-                                            <span>18</span>
-                                            <span>19</span>
-                                            <span>20</span>
-                                            <span>21</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="announcementTime">
-                                    <div className="leftModifyWrap">
-                                        <span className="modifyBtn">수정하기</span>
-                                    </div>
-                                    <div className="announcementTime__Info">
-                                        <dl className="careListTxt">
-                                            <div className="announcementTime__Info--start">
-                                                <dt>간병 시작 시간</dt>
-                                                <dd>2020.06.08.월요일 오전 10:00</dd>
-                                            </div>
-                                            <div className="announcementTime__Info--finish">
-                                                <dt>간병 종료 시간</dt>
-                                                <dd>2020.06.08.월요일 오전 10:00</dd>
-                                            </div>
-                                            <div className="announcementTime__Info--total">
-                                                <dt>총 간병시간</dt>
-                                                <dd><strong>000일 000시간 00분</strong></dd>
-                                            </div>
-                                        </dl>
-                                    </div>
-                                </div>
+                                    {renderCareCalendar()}
+                            
                             </article>
                             <article className="commonWrap breakLine">
                                 <h2 className="a11y-hidden">코로나 일정 논의</h2>
                                 <div className="announcementTit">
                                     <h3 className="txtStyle03-txtBrown">코로나 19 검사 유/무</h3>
                                 </div>
+                                <div className="leftModifyWrap">
+                                <div className="leftModifyWrap">
+                                    <span className="modifyBtn">수정하기</span>
+                                </div>
+                                </div>
                                 <div className="announcementItem">
                                     <ul className="announcementItem__list">
                                         <li>
                                             <div className="announcementItem__list--detail">
                                                 <figure>
-                                                    <img src="../images/covid.svg" alt="코로나" />
+                                                    <img src="/images/covid.svg" alt="코로나" />
                                                 </figure>
                                                 <div>
-                                                    <h4 className="txtStyle04-W500">코로나 19 검사 필요</h4>
+                                                    <h4 className="txtStyle04-W500">코로나 19 검사 {careData.coronaCheck === 1 ? "필요" : "불필요"}</h4>
                                                     <p className="txtStyle05-C333">
                                                         매칭 이후, 검사 일정과 관련하여 케어메이트와 논의해주세요.
                                                     </p>
@@ -679,145 +885,80 @@ const CareDetail = () => {
                                     <div className="announcementPersInfo__info">
                                         <dl className="careListTxt">
                                             <dt>환자 이름</dt>
-                                            <dd>홍*동</dd>
+                                            <dd>{Utils.maskingName(careData.name)}</dd>
                                         </dl>
                                         <dl className="careListTxt">
                                             <div>
                                                 <dt>성별</dt>
-                                                <dd>남성</dd>
+                                                <dd>{careData.gender === 1 ? "남자": "여자"}</dd>
                                             </div>
                                             <div>
                                                 <dt>나이</dt>
-                                                <dd>00세</dd>
+                                                <dd>{careData.age}세</dd>
                                             </div>
                                             <div>
                                                 <dt>키</dt>
-                                                <dd>000cm</dd>
+                                                <dd>{careData.height}cm</dd>
                                             </div>
                                             <div>
                                                 <dt>몸무게</dt>
-                                                <dd>000kg</dd>
+                                                <dd>{careData.weight}kg</dd>
                                             </div>
                                         </dl>
                                         <dl className="careListTxt">
                                             <dt>진단명</dt>
                                             <dd>
-                                                뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색뇌경색
+                                                {
+                                                    !Utils.isEmpty(careData.diagnosis) && careData.diagnosis
+                                                }
                                             </dd>
                                         </dl>
                                     </div>
                                 </div>
                                 <div className="announcementItem">
                                     <div className="announcementItem__Tit">
+                                        <h3 className="txtStyle03-W500">* 병실</h3>
+                                        <span className="modifyBtn">수정하기</span>
+                                    </div>
+                                    <ul className="announcementItem__list">
+                                        <li>
+                                            <div className="announcementItem__list--detail">
+                                                <figure>
+                                                    <button type="button">도움말 보기</button>
+                                                    <img src={HelpInfo.careHelpInfo00[careData.sickroomType - 1].img} alt="병실" />
+                                                </figure>
+                                                <div>
+                                                    <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo00[careData.sickroomType - 1].title}</h4>
+                                                    <p className="txtStyle05-C333">
+                                                    {HelpInfo.careHelpInfo00[careData.sickroomType - 1].extendContent}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div className="announcementItem">
+                                    <div className="announcementItem__Tit">
+                                        <h3 className="txtStyle03-W500">* 감염성 질환</h3>
+                                        <span className="modifyBtn">수정하기</span>
+                                    </div>
+                                    <ul className="announcementItem__list">
+                                    {renderInfectiousDiseaseSelect}
+                                    </ul>
+                                </div>
+
+                                <div className="announcementItem">
+                                    <div className="announcementItem__Tit">
                                         <h3 className="txtStyle03-W500">* 전신</h3>
                                         <span className="modifyBtn">수정하기</span>
                                     </div>
                                     <ul className="announcementItem__list">
-                                        <li>
-                                            <div className="announcementItem__list--detail">
-                                                <figure>
-                                                    <button type="button">도움말 보기</button>
-                                                    <img src="../images/paralysis02.svg" alt="코로나" />
-                                                </figure>
-                                                <div>
-                                                    <h4 className="txtStyle04-W500">마비상태</h4>
-                                                    <p className="txtStyle05-C333">
-                                                        반신이마비되었습니다.반신이마비되었습니다반신이마비되었습니다반신이마비되었습니다반신이마비되었습니다반신이마비되었습니다반신이마비되었습니다반신이마비되었습니다
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="announcementItem__list--detail">
-                                                <figure>
-                                                    <button type="button">도움말 보기</button>
-                                                    <img src="../images/behavior02.svg" alt="부축필요" />
-                                                </figure>
-                                                <div>
-                                                    <h4 className="txtStyle04-W500">거동상태</h4>
-                                                    <p className="txtStyle05-C333">부축이 필요합니다.</p>
-                                                </div>
-                                            </div>
-                                            <div className="announcementItem__list--opini">
-                                                <div>
-                                                    <h5 className="txtStyle04-W500"><mark>보호자 의견</mark></h5>
-                                                    <p className="txtStyle05-C333">
-                                                        xxxxxx xxxxxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxxxxxxx xxxxxx xxxxxxxxxxxxxx
-                                                        xxxxxxxxxxx xxxxxxxxxxxxxxxx xxxxxx
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="announcementItem__list--detail">
-                                                <figure>
-                                                    <button type="button">도움말 보기</button>
-                                                    <img src="../images/pressure01.svg" alt="코로나" />
-                                                </figure>
-                                                <div>
-                                                    <h4 className="txtStyle04-W500">욕창 유/무</h4>
-                                                    <p className="txtStyle05-C333">욕창환자입니다.</p>
-                                                </div>
-                                            </div>
-                                        </li>
+                                    {renderMoveBodySelect}
                                     </ul>
                                 </div>
-                                <div className="announcementItem">
-                                    <div className="announcementItem__Tit">
-                                        <h3 className="txtStyle03-W500">* 화장실/배변도구/장루</h3>
-                                        <span className="modifyBtn">수정하기</span>
-                                    </div>
-                                    <ul className="announcementItem__list">
-                                        <li>
-                                            <div className="announcementItem__list--detail">
-                                                <figure>
-                                                    <button type="button">도움말 보기</button>
-                                                    <img src="../images/meal02.svg" alt="코로나" />
-                                                </figure>
-                                                <div>
-                                                    <h4 className="txtStyle04-W500">식사</h4>
-                                                    <p className="txtStyle05-C333">도움 필요합니다</p>
-                                                </div>
-                                            </div>
-                                            <div className="announcementItem__list--opini">
-                                                <div>
-                                                    <h5 className="txtStyle04-W500"><mark>보호자 의견</mark></h5>
-                                                    <p className="txtStyle05-C333">
-                                                        xxxxxx xxxxxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxxxxxxx xxxxxx xxxxxxxxxxxxxx
-                                                        xxxxxxxxxxx xxxxxxxxxxxxxxxx xxxxxx xxxxxxxxxxxxxx xxxxxxxxxxx
-                                                        xxxxxxxxxxxxxxxx xxxxxx xxxxxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxxxxxxx
-                                                        xxxxxx xxxxxxxxxxxxxx xxxxxxxxxxx xxxxxxxxxxxxxxxx xxxxxx xxxxxxxxxxxxxx
-                                                        xxxxxxxxxxx xxxxxxxxxxxxxxxx
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="announcementItem__list--detail">
-                                                <figure>
-                                                    <button type="button">도움말 보기</button>
-                                                    <img src="../images/behavior01.svg" alt="코로나" />
-                                                </figure>
-                                                <div>
-                                                    <h4 className="txtStyle04-W500">거동상태</h4>
-                                                    <p className="txtStyle05-C333">부축이 필요합니다.</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="announcementItem__list--detail">
-                                                <figure>
-                                                    <button type="button">도움말 보기</button>
-                                                    <img src="../images/pressure01.svg" alt="코로나" />
-                                                </figure>
-                                                <div>
-                                                    <h4 className="txtStyle04-W500">욕창 유/무</h4>
-                                                    <p className="txtStyle05-C333">욕창환자입니다.</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
+
+
                                 <div className="announcementItem">
                                     <div className="announcementItem__Tit">
                                         <h3 className="txtStyle03-W500">* 재활/투석/기타</h3>

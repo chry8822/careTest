@@ -183,6 +183,40 @@ const chainingMode = "AES-256-CBC";
 }
 
 
+
+
+/**
+ * 이름 두번째 글자 마스킹처리
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param name : 이름
+ */
+ export function maskingName(name: string) {
+    if (isEmpty(name)) {
+        return;
+    }
+
+    let nameArr = name.split("");
+
+    let replaceNameArr = nameArr.map((item: any, idx: number) => {
+        if (idx === 1) {
+            item = "*";
+        }
+        return item;
+    });
+
+    return replaceNameArr.join("");
+}
+/**
+ * 문자열 공백 제거
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+ export function trimData(value: string) {
+    return isEmpty(value) ? "" : value.trim();
+}
+
+
+
 //##################################################################################################################
 //##
 //## >> Method : Adjust / Analytics

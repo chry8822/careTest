@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../common/header';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as Utils from '../../constants/utils'
 import ExtendTypePopup from './popup/popup'
 import { useDispatch } from 'react-redux';
 import { showPopup, hidePopup } from './../../redux/actions/popup/popup';
 import Popup from "../common/popup";
+import * as LocalStorage from '../../constants/localStorage';
+import {initCare} from "../../redux/actions/care/care";
 
 
 const CareExtend = () => {
 
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const getParam = useParams()
 
-    const [extendType, setExtendType] = useState('');
-    const [placeType, setPlaceType] = useState('');
+    const [extendType, setExtendType] = useState(''); //## timeCare01 : 시간제 , timeCare02 : 기간제
+    const [placeType, setPlaceType] = useState('');   //## placeCare01: 병.의원 , placeCare02 : 집
+    const [familyId] = useState(getParam.familyId || 0);
+
 
     //##################################################################################################################
     //##
@@ -25,7 +30,7 @@ const CareExtend = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
 
-        // //### 공고 등록 store 초기화
+        //### 공고 등록 store 초기화
         // dispatch(initCare());
 
         // socket = new SocketIO("");
@@ -49,7 +54,39 @@ const CareExtend = () => {
      * @param type : result Type
      */
      const popupAction = (type: string) => {
-        dispatch(hidePopup());
+        dispatch(hidePopup())
+        console.log("팝엎비잗거ㅣㅏㅓㅇㄹ")
+        if(extendType === "timeCare01" || extendType === "timeCare02") {
+            let jobType = extendType === "timeCare01" ? "time" : "day";
+            let requestType = placeType === "placeCare01" ? "hospital" : "home";
+            let paramFamilyId = (Utils.isEmpty(familyId) || familyId === 0) ? '' : `/${familyId}`;
+
+            
+            if(jobType === "day") { //# 기간제 
+                if(requestType === "hopital"){ //# 병원
+                    Utils.adjustEvent("i3skha");
+                    Utils.analyticsEvent("care_dhos_st");
+                } else {                       //# 집
+                    Utils.adjustEvent("pasc1c");
+                    Utils.analyticsEvent("care_dhom_st");
+                }
+            }else {
+                if (requestType === "hospital") { //# 병원
+                    Utils.adjustEvent("f4ga1y");
+                    Utils.analyticsEvent("care_thos_st");
+                } else {                          //# 집
+                    Utils.adjustEvent("qyrh0o");
+                    Utils.analyticsEvent("care_thom_st");
+                }
+            }
+                  //### 공고 등록 store 초기화
+                  dispatch(initCare());
+
+                  LocalStorage.remove(LocalStorage.LOAD_WRITE_DATA);
+
+            navigate(`/care/place/register/${jobType}/${requestType}${paramFamilyId}`);
+        }
+
     }
 
 
@@ -88,7 +125,8 @@ const CareExtend = () => {
                   action:popupAction,
                   type:"bottomPopup",
                   title:extendType,
-                  content:placeType
+                  content:placeType,
+                  actionType:"timeCare01"
                 }))
                   // extendType 에 들어오는 시간제 , 기간제 타입을 타이틀로 넘겨줘서 해당 타입에 맞는 팝업 노출
         }
