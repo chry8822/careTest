@@ -15,6 +15,7 @@ import * as CareUtils from '../care/common/careUtils'
 import SocketIO from "../../constants/socket";
 import RenderDayCalendar from './render/dayCareCalendar'
 import * as HelpInfo from '../../component/care/popup/helpInfo'
+import ht from 'date-fns/esm/locale/ht/index.js';
 
 let phone: string = "";
 let userId: string = "";
@@ -48,6 +49,7 @@ const CareDetail = () => {
     const [detailType, setDetailType] = useState<string>(getParam.type || "register");    //## register / edit / view
     const [tabPosition, setTabPosition] = useState<number>(Utils.isEmpty(parsed.tab) ? 0 : Number(parsed.tab)); //## 탭 0: 간병 상세 /  1: 지원한 케어메이트, 결제 정보
     const [agreeCheck, setAgreeCheck] = useState<boolean>(false);  //## 개인정보 제3자 제공 동의서 이전 체크 유/무
+    const [privacyAgreeFlag, setPrivacyAgreeFlag] = useState<boolean>(false); //## 개인정보 제3자 제공 동의 Radio Flag
     const [reFlag] = useState<boolean>(parsed.reFlag === "true" || false); //## 재등록 분기
     const [curDate, setCurDate] = useState<any>();                          //## 달력 날짜 데이터
     const [jobId] = useState<number>(Number(getParam.jobId) || 0); //## 수정 중인 공고 ID
@@ -649,21 +651,20 @@ console.log("jobStatus.status",detailData.jobType)
 
 
     let { infectiousDisease, infectiousDiseaseEtc } = careData;
-    const diseaseCheckArr = [
-        infectiousDisease === 0,
+    const diseaseCheckArr:any[] = [
         (infectiousDisease & 1) > 0,
         (infectiousDisease & 2) > 0,
         (infectiousDisease & 4) > 0,
         (infectiousDisease & 8) > 0,
         (infectiousDisease & 16) > 0,
         (infectiousDisease & 32) > 0,
+        infectiousDisease ? infectiousDisease === 0 : true, 
     ];
-
 
     const renderInfectiousDiseaseSelect = useMemo(()=> {
         let html:any[] = [];
-        diseaseCheckArr.forEach((item:any, idx:any) => {
-            if(diseaseCheckArr[idx + 1]) {
+        HelpInfo.careHelpInfo01.forEach((item:any, idx:any) => {
+            if(diseaseCheckArr[idx]) {
                 html.push(
                     <li>
                         <div className="announcementItem__list--detail">
@@ -678,6 +679,15 @@ console.log("jobStatus.status",detailData.jobType)
                                 </p>
                             </div>
                         </div>
+                            {
+                                ((idx === 5 && !Utils.isEmpty(careData.cognitiveDementiaEtc)) || (idx === 5 && !Utils.isEmpty(careData.cognitiveDeliriumEtc))) &&
+                                <div className='announcementItem__list--opini'>
+                                    <div>
+                                        <h5 className='"txtStyle04-W500"'><mark>보호자 의견</mark></h5>
+                                        <p className='"txtStyle05-C333"'>{idx === 0 ? careData.cognitiveDementiaEtc : careData.cognitiveDeliriumEtc}</p>
+                                    </div>
+                                </div>
+                            }
                     </li>
                     )
             }
@@ -689,8 +699,6 @@ console.log("jobStatus.status",detailData.jobType)
      * 마비 / 거동 / 욕창 선택 Rendering
      * -----------------------------------------------------------------------------------------------------------------
      */
-
-    
     
     const renderMoveBodySelect = useMemo(() => {
         let selectPosition01: number = careData.paralysis - 1;
@@ -751,6 +759,321 @@ console.log("jobStatus.status",detailData.jobType)
             )
         return html
     },[])
+    
+
+    /**
+     * 의식 / 수면 상태 선택 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+     let { cognitive } = careData;
+     const cognitiveCheckArr = [
+         (cognitive & 1) > 0,
+         (cognitive & 2) > 0,
+         cognitive === 0,
+        ];
+ 
+
+    const renderConsciousnessSelect = useMemo(() => {
+        let html: any[] = [];
+        if(careData.consciousness > 0){
+            html.push(
+                <li>
+                    <div className="announcementItem__list--detail">
+                        <figure>
+                            <button type="button">도움말 보기</button>
+                            <img src={HelpInfo.careHelpInfo05[careData.consciousness - 1].img}alt="코로나" />
+                        </figure>
+                        <div>
+                            <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo05[careData.consciousness - 1].title}</h4>
+                            <p className="txtStyle05-C333">
+                            {HelpInfo.careHelpInfo05[careData.consciousness - 1].content}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+            )
+        }
+        HelpInfo.careHelpInfo06.forEach((item:any ,idx:any) => {
+            if(cognitiveCheckArr[idx]) {
+                html.push(
+                    <li>
+                        <div className="announcementItem__list--detail">
+                            <figure>
+                                <button type="button">도움말 보기</button>
+                                <img src={HelpInfo.careHelpInfo06[careData.consciousness - 1].img}alt="코로나" />
+                            </figure>
+                            <div>
+                                <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo06[careData.consciousness - 1].title}</h4>
+                                <p className="txtStyle05-C333">
+                                {HelpInfo.careHelpInfo06[careData.consciousness - 1].content}
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                )
+            }
+        })
+        return html;
+    },[])
+
+
+    /**
+     * 화장실/배변도구/장루 선택 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+     let { toiletType } = careData;
+     const toiletTypeCheckArr = [
+        (toiletType & 1) > 0,
+        (toiletType & 2) > 0,
+        toiletType === 0,
+    ];
+
+    const renderToiletSelet = useMemo(() => {
+        let html:any[] = [];
+        let { moveToilet } = careData;
+        let checkNum:number;
+        moveToilet === 3 ? checkNum = 0 : moveToilet === 2 ? checkNum = 1 :  checkNum = 2 
+
+            html.push(
+                <li>
+                    <div className="announcementItem__list--detail">
+                        <figure>
+                            <button type="button">도움말 보기</button>
+                            <img src={HelpInfo.careHelpInfo08[checkNum].img}alt="코로나" />
+                        </figure>
+                        <div>
+                            <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo08[checkNum].title}</h4>
+                            <p className="txtStyle05-C333">
+                            {HelpInfo.careHelpInfo08[checkNum].content}
+                            </p>
+                        </div>
+                    </div>
+                        {
+                            !Utils.isEmpty(careData.moveToilet) &&  
+                            <div className='announcementItem__list--opini'>
+                                <div>
+                                    <h5 className='"txtStyle04-W500"'><mark>보호자 의견</mark></h5>
+                                    <p className='"txtStyle05-C333"'>{careData.moveToiletEtc}</p>
+                                </div>
+                            </div>
+                        }
+                </li>
+            )
+            toiletTypeCheckArr.forEach((item:any, idx:any)=> {
+                if(toiletTypeCheckArr[idx]){
+                    html.push(
+                        <li>
+                            <div className="announcementItem__list--detail">
+                                <figure>
+                                    <button type="button">도움말 보기</button>
+                                    <img src={HelpInfo.careHelpInfo09[idx].img}alt="코로나" />
+                                </figure>
+                                <div>
+                                    <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo09[idx].title}</h4>
+                                    <p className="txtStyle05-C333">
+                                    {HelpInfo.careHelpInfo09[idx].content}
+                                    </p>
+                                </div>
+                            </div>
+                                {
+                                    idx === 0 && !Utils.isEmpty(careData.toiletDiapersEtc) ?
+                                    <div className='announcementItem__list--opini'>
+                                        <div>
+                                            <h5 className='"txtStyle04-W500"'><mark>보호자 의견</mark></h5>
+                                            <p className='"txtStyle05-C333"'>
+                                                {careData.toiletDiapersEtc}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    :
+                                    idx === 1 && !Utils.isEmpty(careData.toiletLineEtc) &&
+                                    <div className='announcementItem__list--opini'>
+                                    <div>
+                                        <h5 className='"txtStyle04-W500"'><mark>보호자 의견</mark></h5>
+                                        <p className='"txtStyle05-C333"'>
+                                            {careData.toiletLineEtc}
+                                        </p>
+                                    </div>
+                                </div>
+                                }
+                        </li>
+                    )
+                }
+            })
+            {
+                careData.stoma === 1 &&
+                html.push(
+                    <li>
+                        <div className="announcementItem__list--detail">
+                            <figure>
+                                <button type="button">도움말 보기</button>
+                                <img src={HelpInfo.careHelpInfo10[0].img}alt="코로나" />
+                            </figure>
+                            <div>
+                                <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo10[0].title}</h4>
+                                <p className="txtStyle05-C333">
+                                {HelpInfo.careHelpInfo10[0].content}
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                )
+            }
+
+        return html;
+    },[])
+
+    /**
+     * 식사/석션/피딩 선택 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    const renderEatSelect = useMemo(()=> {
+        let html:any[] = [];
+        let count = 3;
+        html.push(
+          <>
+                <li>
+                    <div className="announcementItem__list--detail">
+                        <figure>
+                            <button type="button">도움말 보기</button>
+                            <img src={HelpInfo.careHelpInfo11[count - careData.eat].img}alt="코로나" />
+                        </figure>
+                        <div>
+                            <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo11[count - careData.eat].title}</h4>
+                            <p className="txtStyle05-C333">
+                            {HelpInfo.careHelpInfo11[count - careData.eat].content}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+                {
+                    careData.suction === 1 &&
+                    <li>
+                        <div className="announcementItem__list--detail">
+                            <figure>
+                                <button type="button">도움말 보기</button>
+                                <img src={HelpInfo.careHelpInfo12[0].img}alt="코로나" />
+                            </figure>
+                            <div>
+                                <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo12[0].title}</h4>
+                                <p className="txtStyle05-C333">
+                                {HelpInfo.careHelpInfo12[0].content}
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                }
+                {
+                    careData.feeding === 1 &&
+                    <li>
+                        <div className="announcementItem__list--detail">
+                            <figure>
+                                <button type="button">도움말 보기</button>
+                                <img src={HelpInfo.careHelpInfo13[0].img}alt="코로나" />
+                            </figure>
+                            <div>
+                                <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo13[0].title}</h4>
+                                <p className="txtStyle05-C333">
+                                {HelpInfo.careHelpInfo13[0].content}
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                }
+          </>
+        )
+        return html;
+    },[])
+
+    /**
+     * 재활/투석/기타 선택 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    let { favoriteGender } = careData
+    let favoriteCareGender:string;
+    favoriteGender === 3 ? favoriteCareGender = "상관없음" : favoriteGender === 2 ? favoriteCareGender = "여자" : "남자";
+
+    const renderRehabilitateSelect = useMemo(() => {
+        let html:any[] = [];
+
+        html.push(
+           <>
+                {
+                    careData.rehabilitate === 1 &&
+                    <li>
+                        <div className="announcementItem__list--detail">
+                            <figure>
+                                <button type="button">도움말 보기</button>
+                                <img src={HelpInfo.careHelpInfo14[0].img}alt="코로나" />
+                            </figure>
+                            <div>
+                                <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo14[0].title}</h4>
+                                <p className="txtStyle05-C333">
+                                {HelpInfo.careHelpInfo14[0].content}
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                }
+                {
+                    careData.dialysis === 1 &&
+                    <li>
+                        <div className="announcementItem__list--detail">
+                            <figure>
+                                <button type="button">도움말 보기</button>
+                                <img src={HelpInfo.careHelpInfo15[0].img}alt="코로나" />
+                            </figure>
+                            <div>
+                                <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo15[0].title}</h4>
+                                <p className="txtStyle05-C333">
+                                {HelpInfo.careHelpInfo15[0].content}
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                }
+                {
+                    <li>
+                        <div className="announcementItem__list--detail">
+                            <figure>
+                                <button type="button">도움말 보기</button>
+                                <img src={HelpInfo.careHelpInfo16[0].img}alt="코로나" />
+                            </figure>
+                            <div>
+                                <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo16[0].title}</h4>
+                                <p className="txtStyle05-C333">
+                                {favoriteCareGender}
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                }
+                {
+                    <li>
+                        <div className="announcementItem__list--detail">
+                            <figure>
+                                <button type="button">도움말 보기</button>
+                                <img src={HelpInfo.careHelpInfo17[0].img}alt="코로나" />
+                            </figure>
+                            <div>
+                                <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo17[0].title}</h4>
+                                <p className="txtStyle05-C333">
+                                {careData.isWantUniform === "Y" ? "케어네이션 유니폼" : "상관없음"}
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </>  
+        )
+        return html;
+    },[])
+
+
 
 
     //##################################################################################################################
@@ -947,7 +1270,6 @@ console.log("jobStatus.status",detailData.jobType)
                                     {renderInfectiousDiseaseSelect}
                                     </ul>
                                 </div>
-
                                 <div className="announcementItem">
                                     <div className="announcementItem__Tit">
                                         <h3 className="txtStyle03-W500">* 전신</h3>
@@ -957,26 +1279,40 @@ console.log("jobStatus.status",detailData.jobType)
                                     {renderMoveBodySelect}
                                     </ul>
                                 </div>
-
-
+                                <div className="announcementItem">
+                                    <div className="announcementItem__Tit">
+                                        <h3 className="txtStyle03-W500">* 의식/인지 및 수면장애</h3>
+                                        <span className="modifyBtn">수정하기</span>
+                                    </div>
+                                    <ul className="announcementItem__list">
+                                        {renderConsciousnessSelect}
+                                    </ul>
+                                </div>
+                                <div className="announcementItem">
+                                    <div className="announcementItem__Tit">
+                                        <h3 className="txtStyle03-W500">* 화장실/배변도구/장루</h3>
+                                        <span className="modifyBtn">수정하기</span>
+                                    </div>
+                                    <ul className="announcementItem__list">
+                                        {renderToiletSelet}
+                                    </ul>
+                                </div>
+                                <div className="announcementItem">
+                                    <div className="announcementItem__Tit">
+                                        <h3 className="txtStyle03-W500">* 식사/석션/피딩</h3>
+                                        <span className="modifyBtn">수정하기</span>
+                                    </div>
+                                    <ul className="announcementItem__list">
+                                        {renderEatSelect}
+                                    </ul>
+                                </div>
                                 <div className="announcementItem">
                                     <div className="announcementItem__Tit">
                                         <h3 className="txtStyle03-W500">* 재활/투석/기타</h3>
                                         <span className="modifyBtn">수정하기</span>
                                     </div>
                                     <ul className="announcementItem__list">
-                                        <li>
-                                            <div className="announcementItem__list--detail">
-                                                <figure>
-                                                    <button type="button">도움말 보기</button>
-                                                    <img src="../images/uniform.svg" alt="유니폼 착용 여부" />
-                                                </figure>
-                                                <div>
-                                                    <h4 className="txtStyle04-W500">선호하는 케어메이트 복장</h4>
-                                                    <p className="txtStyle05-C333">케어네이션 유니폼</p>
-                                                </div>
-                                            </div>
-                                        </li>
+                                        {renderRehabilitateSelect}
                                     </ul>
                                 </div>
                                 <div className="announcementItem">
@@ -984,52 +1320,74 @@ console.log("jobStatus.status",detailData.jobType)
                                         <h3 className="txtStyle03-W500">환자의 입원 사유와 기타 사항</h3>
                                         <span className="modifyBtn">수정하기</span>
                                     </div>
-                                    <textarea>
-                                        XXXXXXX XXXXXXXXXXXXXXXXXX XXXXXXXXXXXX XXXXXXXXXXXXX XXXXXXXXXXXXXX.</textarea
+                                    <textarea
+                                        placeholder='보호자가 작성한 간병 유의사항이 없습니다.'
+                                        disabled
                                     >
+                                        {careData.hospitalizeReason}
+                                    </textarea>
                                 </div>
                             </article>
-                            <article className="bigData">
-                                <div className="bigData__tit">
-                                    <h2 className="a11y-hidden">케어네이션에서 예상한 간병비</h2>
-                                    <img src="../images/bigDataLogo.svg" alt="CARENATION DATA LAB." />
-                                    <p className="txtStyle05">빅데이터 통계를 통해 예상 지원 금액을 보여드려요.</p>
-                                </div>
-                                <div className="bigData__chart">
-                                    <span>기준 : 일 간병비</span>
-                                    <div className="areaChart">꺾은선 그래프 넣는 자리</div>
-                                    <div className="rangeAxis">
-                                        <p>
-                                            <span>80,000원</span>
-                                            <span>115,000원</span>
+
+                            {
+                                detailType === "view" &&
+                                <article className="bigData">
+                                    <div className="bigData__tit">
+                                        <h2 className="a11y-hidden">케어네이션에서 예상한 간병비</h2>
+                                        <img src="../images/bigDataLogo.svg" alt="CARENATION DATA LAB." />
+                                        <p className="txtStyle05">빅데이터 통계를 통해 예상 지원 금액을 보여드려요.</p>
+                                    </div>
+                                    <div className="bigData__chart">
+                                        <span>기준 : 일 간병비</span>
+                                        <div className="areaChart">꺾은선 그래프 넣는 자리</div>
+                                        <div className="rangeAxis">
+                                            <p>
+                                                <span>80,000원</span>
+                                                <span>115,000원</span>
+                                            </p>
+                                        </div>
+                                        <p className="txtStyle05-C333">
+                                            현재 공고와 비슷한 공고의 지원 금액은<br />
+                                            <strong><span>80,000</span>원 ~ <span>115,000</span>원</strong> 입니다.
                                         </p>
                                     </div>
-                                    <p className="txtStyle05-C333">
-                                        현재 공고와 비슷한 공고의 지원 금액은<br />
-                                        <strong><span>80,000</span>원 ~ <span>115,000</span>원</strong> 입니다.
-                                    </p>
-                                </div>
-                                <div className="bigData__info">
-                                    <p className="txtStyle05-C333">
-                                        예상 지원 금액 정보는 참고용 자료입니다. 실제 지원 금액과 다를 수 있습니다.
-                                    </p>
-                                </div>
-                            </article>
+                                    <div className="bigData__info">
+                                        <p className="txtStyle05-C333">
+                                            예상 지원 금액 정보는 참고용 자료입니다. 실제 지원 금액과 다를 수 있습니다.
+                                        </p>
+                                    </div>
+                                </article>
+                            }
+                            
                         </section>
                     </div>
+
                     <div className="noticeInfo">
+                    {
+                        !agreeCheck &&
                         <div className="noticeInfo__agree">
                             <div className="noticeInfo__agree--tit">
                                 <h2 className="txtStyle03">
                                     개인정보 제3자 제공 동의서<span className="txtRed">필수</span>
                                 </h2>
-                                <a href="" className="secession">보기</a>
+                                <a href="" className="secession"
+                                    onClick={()=> navigate("/care/detail/thirdParty")}
+                                >보기</a>
                             </div>
                             <div className="checkSelect__box">
-                                <input type="checkbox" id="noticeAgree" name="noticeAgree" />
+                                <input 
+                                    type="checkbox" 
+                                    id="noticeAgree" 
+                                    name="noticeAgree" 
+                                    checked={privacyAgreeFlag}
+                                    onClick={()=>
+                                        setPrivacyAgreeFlag(!privacyAgreeFlag)
+                                    }
+                                />
                                 <label htmlFor="noticeAgree" className="mb0">네, 동의합니다.</label>
                             </div>
                         </div>
+                    }
                         <div className="noticeInfo__txt">
                             <h2>환자 정보 설명글에 대한 참고사항</h2>
                             <p>
@@ -1037,11 +1395,24 @@ console.log("jobStatus.status",detailData.jobType)
                                 수 있습니다. 이를 제공한 개인 및 사업자는 법률적 책임이 없음을 안내해 드립니다.
                             </p>
                         </div>
-                        <div className="btnWrap">
-                            <button type="button" className="btnBorder">취소하기</button>
-                            <button type="button" className="btnColor">수정하기</button>
-                        </div>
+
+                        {
+                            detailType === "register" ? 
+                            <div className="btnWrap">
+                                <button 
+                                    type="button" 
+                                    className="btnColor"
+
+                                >등록하기</button>
+                            </div>
+                            :
+                            <div className="btnWrap">
+                                <button type="button" className="btnBorder">취소하기</button>
+                                <button type="button" className="btnColor">수정하기</button>
+                            </div>
+                        }
                     </div>
+
                 </div>
             </main>
         </>

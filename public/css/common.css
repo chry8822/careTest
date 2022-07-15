@@ -3784,10 +3784,10 @@ header .close,
   max-width: 96px;
 }
 .rc-time-picker-panel-inner .rc-time-picker-panel-select:last-child {
-  width: 100%;
+  width: 39px;
 }
 .rc-time-picker-panel-inner .rc-time-picker-panel-select:last-child li {
-  padding-left: 35px;
+  padding-left: 10px;
 }
 
 /* 간병설정 */

@@ -12,7 +12,8 @@ import {
     CareRender,
     CareWrite,
     CareDetail,
-    CareFamily
+    CareFamily,
+    ThirdPartyDetail
 } from "./component";
 import Popup from './container/popup/popup';
 
@@ -40,6 +41,7 @@ const Root: React.FC  = ()=> {
                                 <Route path=":type/:step/:time/:place/:familyId" element={<CareWrite/>}/>
                             </Route>
                             <Route path="detail">
+                                <Route path="thirdParty" element={<ThirdPartyDetail/>}/>
                                 <Route path=":type/:time/:place" element={<CareDetail/>}/>
                                 <Route path=":type/:time/:place/:familyId" element={<CareDetail/>}/>
                                 <Route path=":type/:time/:place/:familyId/:jobId" element={<CareDetail/>}/>

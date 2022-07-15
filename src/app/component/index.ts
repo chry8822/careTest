@@ -6,3 +6,4 @@ export { default as CareRender } from "./care/renderWrite/careRender00"
 export { default as CareWrite } from "./care/write"
 export { default as CareDetail } from "./care/detail";
 export { default as CareFamily } from "./family/list";
+export { default as ThirdPartyDetail } from "./common/thirdParty";

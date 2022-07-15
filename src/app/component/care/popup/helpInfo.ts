@@ -1,3 +1,5 @@
+
+
 /**
  * Care Help Popup Data00(병실 선택)
  * -----------------------------------------------------------------------------------------------------------------
@@ -68,6 +70,16 @@ export const careHelpInfo01 = [
         img: "/images/infectious06.svg",
         title: "독감",
         content: `인플루엔자 바이러스에 의한 <br/> 전염성이 높은 급성 호흡기질환입니다.`
+    },
+    {
+        img: "/images/infectious07.svg",
+        title: "기타 감염성 질환",
+        content: ""
+    },
+    {
+        img: "/images/infectious01.svg",
+        title: "질환 분류",
+        content: "감염성 질환이 없습니다."
     }
 ];
 
