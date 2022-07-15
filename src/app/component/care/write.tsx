@@ -264,7 +264,7 @@ const CareWrite = () => {
     const sickRoomValidationMsg = () => {
         const{ sickroomType } = detailPlaceType === "edit" ? editData : careData;
         let checkMsg:string ="";
-        if(sickroomType < 0) {
+        if(sickroomType <= 0) {
             checkMsg = "환자의 병실을 선택해주세요."
         }
         return checkMsg;
@@ -295,11 +295,11 @@ const CareWrite = () => {
     const behaviorCheckValidationMsg = () => {
         const {move, paralysis, changePosture } = detailPlaceType === "edit" ? editData : careData;
         let checkMsg:string ="";
-        if(paralysis < 0) {
+        if(paralysis <= 0) {
             checkMsg = "마비 상태를 선택해주세요."
-        }else if(move < 0) {
+        }else if(move <= 0) {
             checkMsg = "거동 기능 상태를 선택해주세요."
-        }else if(changePosture < 0) {
+        }else if(changePosture <= 0) {
             checkMsg = "욕창 유/무를 선택해주세요."
         }
 
@@ -314,11 +314,11 @@ const CareWrite = () => {
         const cognitiveCheckValidationMsg = () => {
         const {consciousness ,cognitive,somnipathy } = detailPlaceType === "edit" ? editData : careData;
         let checkMsg:string ="";
-        if(consciousness < 0) {
+        if(consciousness <= 0) {
             checkMsg = "의식 상태를 선택해주세요."
         }else if(cognitive === 4){
             checkMsg = "인지장애를 선택해주세요."
-        }else if(somnipathy < 0){
+        }else if(somnipathy <= 0){
             checkMsg = "수면장애 유/무를 선택해주세요."
         }
 
@@ -336,11 +336,11 @@ const CareWrite = () => {
      const toiletCheckValidationMsg = () => {
         let {moveToilet, toiletType, stoma }= detailPlaceType === "edit" ? editData : careData;
         let checkMsg:string ="";
-        if(moveToilet < 0) {
+        if(moveToilet <= 0) {
             checkMsg = "화장실 이용 유/무를 선택해주세요."
         }else if(toiletType === 4){
             checkMsg = "배변도구를 선택해주세요."
-        }else if(stoma < 0){
+        }else if(stoma <= 0){
             checkMsg = "장루설치 유/무를 선택해주세요."
         }
 
@@ -358,11 +358,11 @@ const CareWrite = () => {
      const eatConditionCheckValidationMsg = () => {
         let {eat, suction, feeding }= detailPlaceType === "edit" ? editData : careData;
         let checkMsg:string ="";
-        if(eat < 0) {
+        if(eat <= 0) {
             checkMsg = "식사 가능 상태를 선택해주세요."
-        }else if(suction < 0){
+        }else if(suction <= 0){
             checkMsg = "석션 사용 유/무 선택해주세요."
-        }else if(feeding < 0){
+        }else if(feeding <= 0){
             checkMsg = "피딩 사용 유/무를 선택해주세요."
         }
 
@@ -379,11 +379,11 @@ const CareWrite = () => {
          const rehabilitateCheckValidationMsg = () => {
             let {rehabilitate, dialysis, favoriteGender, isWantUniform }= detailPlaceType === "edit" ? editData : careData;
             let checkMsg:string ="";
-            if(rehabilitate < 0) {
+            if(rehabilitate <= 0) {
                 checkMsg = "재활 유/무 선택해주세요."
-            }else if(dialysis < 0){
+            }else if(dialysis <= 0){
                 checkMsg = "투석 유/무 선택해주세요."
-            }else if(favoriteGender < 0){
+            }else if(favoriteGender <= 0){
                 checkMsg = "우대하는 케어메이트 성별을 선택해주세요."
             }else if(Utils.isEmpty(isWantUniform)){
                 checkMsg = "선호하는 케어메이트 복장을 선택해주세요."
@@ -449,7 +449,7 @@ const CareWrite = () => {
         
     }
 
-
+    console.log("step",step)
 
     /**
      * 다음 버튼 
@@ -484,7 +484,7 @@ const CareWrite = () => {
             if (validationCheckMsg === "badwordsCheck") {
                 return
             }
-            dispatch(showPopup({ element: Popup, action: popupAction, content: validationCheckMsg }))
+            dispatch(showPopup({ element: Popup, action: popupAction ,content: validationCheckMsg }))
         } else {
             if (step === 2) { //# [이름/성별/나이/몸무게] 입력 후 다음 버튼
                 if (jobType === "day") { //# 기간제

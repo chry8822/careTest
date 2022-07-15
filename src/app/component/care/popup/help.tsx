@@ -4,6 +4,8 @@ import Dompurify from "dompurify";
 import * as Utils from "../../../constants/utils";
 import { RootState } from "../../../redux/store";
 import { PopupState } from "../../../redux/states/popup/popup";
+import * as DetailHelpInfo from '../../../component/care/popup/helpInfo'
+
 
 interface HelpInfoType {
     img: string;
@@ -23,29 +25,27 @@ const ExplanationRoomPopup = () => {
     const helpInfo: HelpInfoType[] = require('./helpInfo')[popup.actionType]; //## 도움말 팝업 데이터 (Dynamic Importing)
 
 
-
     const renderTab = useMemo(() => {
         let html: any[] = [];
         {
-            helpInfo.map((item: any, idx: number) => {
+            helpInfo.forEach((item: any, idx: number) => {
                 html.push(
                     <li key={idx} className={position === idx ? "active" : ""} onClick={() => setPosition(idx)}>
                         <button type="button">{item.title}</button>
                     </li>
                 );
-                return item;
             });
         }
         return html;
     }, [popup.actionType, position]);
-    console.log(helpInfo[position])
+
     
     return (
         <>
                 <div className="bottomPopupWrap">
                     <div className="bottomPopup__detail">
                     {
-                        (popup.actionType && helpInfo.length > 1) && Utils.isEmpty(popup.title) &&
+                        (popup.actionType && (DetailHelpInfo.careHelpInfo00 || helpInfo.length > 1 )) && Utils.isEmpty(popup.title) &&
                         <div className="headerTabWrap">
                             <ul className="popupWrap__tab" role="tablist">
                                 {renderTab}

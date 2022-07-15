@@ -14,8 +14,10 @@ import * as LocalStorage from '../../constants/localStorage'
 import * as CareUtils from '../care/common/careUtils'
 import SocketIO from "../../constants/socket";
 import RenderDayCalendar from './render/dayCareCalendar'
+import RenderTimeCalendar from './render/timeCareCalendar'
 import * as HelpInfo from '../../component/care/popup/helpInfo'
 import ht from 'date-fns/esm/locale/ht/index.js';
+import ExplanationRoomPopup from '../care/popup/help'
 
 let phone: string = "";
 let userId: string = "";
@@ -199,6 +201,18 @@ const CareDetail = () => {
     //## >> Method : Private
     //##
     //##################################################################################################################
+
+    /** 
+     * helpinfo content <br/> 제거
+     * -----------------------------------------------------------------------------------------------------------------
+     *
+     * @param content : helpinfo content
+     */
+
+    const replaceBr = (content:string) => {
+        let replacedContent = content.replace("<br/>", " ")
+        return replacedContent
+    }
 
     /**
      * 탭 변경 (간병 상세/ 지원한 케어메이트, 결제정보)
@@ -587,13 +601,13 @@ console.log("jobStatus.status",detailData.jobType)
                                             <span className="modifyBtn">수정하기</span>
                                         </div>
                                     }
-                                    <div className="careCalWrap__list">
-                                        {/* <RenderTimeCalendar
+                                    <div className="bgBorderBox">
+                                        <RenderTimeCalendar
                                             curDate={moment(startDate)}
                                             jobData={detailData}
-                                        /> */}
+                                        />
                                     </div>
-                                    <div className="careTime">
+                                    <div className="announcementTime">
                                         {renderTotalCareTime()}
                                     </div>
                                 </>
@@ -634,10 +648,13 @@ console.log("jobStatus.status",detailData.jobType)
                         </div>
                         </>
                         :
-                        <div>
-                            <dt>해당 간병은 선택한 일에</dt>
-                            <dd><strong>{moment(dateStart).format("HH")}시</strong>부터 <strong>{startTime > endTime ? "다음날 " : ""} {moment(dateEnd).format("HH")}시</strong>까지 진행됩니다.</dd>
+                        <div className="announcementTime__Info">
+                                <div className='announcementTime__Info--total'>
+                                    <dt>해당 간병은 선택한 일에</dt>
+                                    <dd><strong>{moment(dateStart).format("HH")}시</strong>부터 <strong>{startTime > endTime ? "다음날 " : ""} {moment(dateEnd).format("HH")}시</strong>까지 진행됩니다.</dd>
+                                </div>
                         </div>
+
                 }
             </dl>
         );
@@ -648,7 +665,7 @@ console.log("jobStatus.status",detailData.jobType)
      * 감염성 질환 선택 Rendering
      * -----------------------------------------------------------------------------------------------------------------
      */
-
+ 
 
     let { infectiousDisease, infectiousDiseaseEtc } = careData;
     const diseaseCheckArr:any[] = [
@@ -675,7 +692,7 @@ console.log("jobStatus.status",detailData.jobType)
                             <div>
                                 <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo01[idx].title}</h4>
                                 <p className="txtStyle05-C333">
-                                {HelpInfo.careHelpInfo01[idx].content}
+                                {replaceBr(HelpInfo.careHelpInfo01[idx].content)}
                                 </p>
                             </div>
                         </div>
@@ -705,7 +722,7 @@ console.log("jobStatus.status",detailData.jobType)
         let selectPosition02: number = careData.move === 1 ? 2 : careData.move === 2 ? 1 : 0;
     
         let html:any[] = [];
-        if(careData.paralysis > 0){
+        if(careData.paralysis !== 3){
             html.push(
                 <li>
                     <div className="announcementItem__list--detail">
@@ -716,7 +733,7 @@ console.log("jobStatus.status",detailData.jobType)
                         <div>
                             <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo02[selectPosition01].title}</h4>
                             <p className="txtStyle05-C333">
-                            {HelpInfo.careHelpInfo02[selectPosition01].content}
+                            {replaceBr(HelpInfo.careHelpInfo02[selectPosition01].content)}
                             </p>
                         </div>
                     </div>
@@ -734,7 +751,7 @@ console.log("jobStatus.status",detailData.jobType)
                         <div>
                             <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo03[selectPosition02].title}</h4>
                             <p className="txtStyle05-C333">
-                            {HelpInfo.careHelpInfo03[selectPosition02].content}
+                            {replaceBr(HelpInfo.careHelpInfo03[selectPosition02].content)}
                             </p>
                         </div>
                     </div>
@@ -742,20 +759,25 @@ console.log("jobStatus.status",detailData.jobType)
             )
         }
             html.push(
-                <li>
-                    <div className="announcementItem__list--detail">
-                        <figure>
-                            <button type="button">도움말 보기</button>
-                            <img src={HelpInfo.careHelpInfo04[careData.changePosture - 1].img}alt="코로나" />
-                        </figure>
-                        <div>
-                            <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo04[careData.changePosture - 1].title}</h4>
-                            <p className="txtStyle05-C333">
-                            {HelpInfo.careHelpInfo04[careData.changePosture - 1].content}
-                            </p>
-                        </div>
-                    </div>
-                </li>
+                <>
+                    {
+                        careData.changePosture === 1 &&
+                        <li>
+                            <div className="announcementItem__list--detail">
+                                <figure>
+                                    <button type="button">도움말 보기</button>
+                                    <img src={HelpInfo.careHelpInfo04[0].img}alt="코로나" />
+                                </figure>
+                                <div>
+                                    <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo04[0].title}</h4>
+                                    <p className="txtStyle05-C333">
+                                    {replaceBr(HelpInfo.careHelpInfo04[0].content)}
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </>
             )
         return html
     },[])
@@ -787,7 +809,7 @@ console.log("jobStatus.status",detailData.jobType)
                         <div>
                             <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo05[careData.consciousness - 1].title}</h4>
                             <p className="txtStyle05-C333">
-                            {HelpInfo.careHelpInfo05[careData.consciousness - 1].content}
+                            {replaceBr(HelpInfo.careHelpInfo05[careData.consciousness - 1].content)}
                             </p>
                         </div>
                     </div>
@@ -806,7 +828,7 @@ console.log("jobStatus.status",detailData.jobType)
                             <div>
                                 <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo06[careData.consciousness - 1].title}</h4>
                                 <p className="txtStyle05-C333">
-                                {HelpInfo.careHelpInfo06[careData.consciousness - 1].content}
+                                {replaceBr(HelpInfo.careHelpInfo06[careData.consciousness - 1].content)}
                                 </p>
                             </div>
                         </div>
@@ -846,12 +868,12 @@ console.log("jobStatus.status",detailData.jobType)
                         <div>
                             <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo08[checkNum].title}</h4>
                             <p className="txtStyle05-C333">
-                            {HelpInfo.careHelpInfo08[checkNum].content}
+                            {replaceBr(HelpInfo.careHelpInfo08[checkNum].content)}
                             </p>
                         </div>
                     </div>
                         {
-                            !Utils.isEmpty(careData.moveToilet) &&  
+                            !Utils.isEmpty(careData.moveToiletEtc) &&  moveToilet < 3 &&
                             <div className='announcementItem__list--opini'>
                                 <div>
                                     <h5 className='"txtStyle04-W500"'><mark>보호자 의견</mark></h5>
@@ -861,7 +883,7 @@ console.log("jobStatus.status",detailData.jobType)
                         }
                 </li>
             )
-            toiletTypeCheckArr.forEach((item:any, idx:any)=> {
+            HelpInfo.careHelpInfo09.forEach((item:any, idx:any)=> {
                 if(toiletTypeCheckArr[idx]){
                     html.push(
                         <li>
@@ -873,7 +895,7 @@ console.log("jobStatus.status",detailData.jobType)
                                 <div>
                                     <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo09[idx].title}</h4>
                                     <p className="txtStyle05-C333">
-                                    {HelpInfo.careHelpInfo09[idx].content}
+                                    {replaceBr(HelpInfo.careHelpInfo09[idx].content)}
                                     </p>
                                 </div>
                             </div>
@@ -914,7 +936,7 @@ console.log("jobStatus.status",detailData.jobType)
                             <div>
                                 <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo10[0].title}</h4>
                                 <p className="txtStyle05-C333">
-                                {HelpInfo.careHelpInfo10[0].content}
+                                {replaceBr(HelpInfo.careHelpInfo10[0].content)}
                                 </p>
                             </div>
                         </div>
@@ -944,7 +966,7 @@ console.log("jobStatus.status",detailData.jobType)
                         <div>
                             <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo11[count - careData.eat].title}</h4>
                             <p className="txtStyle05-C333">
-                            {HelpInfo.careHelpInfo11[count - careData.eat].content}
+                            {replaceBr(HelpInfo.careHelpInfo11[count - careData.eat].content)}
                             </p>
                         </div>
                     </div>
@@ -960,7 +982,7 @@ console.log("jobStatus.status",detailData.jobType)
                             <div>
                                 <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo12[0].title}</h4>
                                 <p className="txtStyle05-C333">
-                                {HelpInfo.careHelpInfo12[0].content}
+                                {replaceBr(HelpInfo.careHelpInfo12[0].content)}
                                 </p>
                             </div>
                         </div>
@@ -977,7 +999,7 @@ console.log("jobStatus.status",detailData.jobType)
                             <div>
                                 <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo13[0].title}</h4>
                                 <p className="txtStyle05-C333">
-                                {HelpInfo.careHelpInfo13[0].content}
+                                {replaceBr(HelpInfo.careHelpInfo13[0].content)}
                                 </p>
                             </div>
                         </div>
@@ -1013,7 +1035,7 @@ console.log("jobStatus.status",detailData.jobType)
                             <div>
                                 <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo14[0].title}</h4>
                                 <p className="txtStyle05-C333">
-                                {HelpInfo.careHelpInfo14[0].content}
+                                {replaceBr(HelpInfo.careHelpInfo14[0].content)}
                                 </p>
                             </div>
                         </div>
@@ -1030,7 +1052,7 @@ console.log("jobStatus.status",detailData.jobType)
                             <div>
                                 <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo15[0].title}</h4>
                                 <p className="txtStyle05-C333">
-                                {HelpInfo.careHelpInfo15[0].content}
+                                {replaceBr(HelpInfo.careHelpInfo15[0].content)}
                                 </p>
                             </div>
                         </div>
@@ -1247,20 +1269,21 @@ console.log("jobStatus.status",detailData.jobType)
                                         <li>
                                             <div className="announcementItem__list--detail">
                                                 <figure>
-                                                    <button type="button">도움말 보기</button>
+                                                    <button 
+                                                        type="button"
+                                                    >도움말 보기</button>
                                                     <img src={HelpInfo.careHelpInfo00[careData.sickroomType - 1].img} alt="병실" />
                                                 </figure>
                                                 <div>
                                                     <h4 className="txtStyle04-W500">{HelpInfo.careHelpInfo00[careData.sickroomType - 1].title}</h4>
                                                     <p className="txtStyle05-C333">
-                                                    {HelpInfo.careHelpInfo00[careData.sickroomType - 1].extendContent}
+                                                    {HelpInfo.careHelpInfo00[careData.sickroomType - 1].content}
                                                     </p>
                                                 </div>
                                             </div>
                                         </li>
                                     </ul>
                                 </div>
-
                                 <div className="announcementItem">
                                     <div className="announcementItem__Tit">
                                         <h3 className="txtStyle03-W500">* 감염성 질환</h3>

@@ -40,39 +40,6 @@ function baseApi(apiUrl: string = "") {
     return test;
 }
 
-// function getMD5Header() {
-//     if (ENCRYPTION_TYPE === 'TRUE') {
-//         let auth = LocalStorage.getStorage(LocalStorage.AUTHORIZATION);
-
-//         return {
-//             headers: {
-//                 'Content-Type': 'text/plain',
-//                 'User-Content-Type': Utils.md5(),
-//                 'Authorization': auth ? auth : ""
-//             }
-//         }
-//     } else {
-//         return {
-//             headers: {
-//                 'Authorization': auth
-//             }
-//         }
-//     }
-// }
-
-
-function getAccessTokenHeader() {
-    let auth = LocalStorage.getStorage(LocalStorage.AUTHORIZATION);
-    if (auth) {
-        return {
-            headers: {
-                'Authorization': auth
-            }
-        }
-    } else {
-        return
-    }
-}
 
 // api 데이터 상태 체크
 function successStatusCheck(response: any, resolve: any) {

@@ -174,7 +174,7 @@ const Main = () => {
         
         //### 작성 중인 공고 있을 때 공고 불러오기 팝업 호출
         if (LocalStorage.getStorage(LocalStorage.LOAD_WRITE_DATA)) {
-            dispatch(showPopup({element:LoadWritePopup, action:popupAction, actionType:"load"}));
+            dispatch(showPopup({element:LoadWritePopup, action:popupAction,type:"popup", actionType:"load"}));
         } else {
             if (mainData.patientsCnt === 0) {
                 navigate("/care/select");
