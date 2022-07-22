@@ -26,7 +26,6 @@ const CareRenderCalendarTest = ({ curDate, jobData, selectCareDate }: RenderTime
 
 
 
-    console.log("startDay",startDayIndex)
 
     // 현재 달
     for (let i = startDay - startDayIndex; i <= 31; i++) {

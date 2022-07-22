@@ -31,6 +31,7 @@ const CarePlace = () => {
     const [ placeType ] = useState<string>(getParam.place || "")
     const [ scrollFlag, setScrollFlag ] = useState(false)
     const [ carePlaceList, setCarePlaceList ] = useState<any[]>([]);
+    const [jobId] = useState<number>(Number(getParam.jobId) || 0);          //## 수정 공고 ID
     const [ familyId ] = useState<number>(Number(getParam.familyId) || 0);    //## 선택한 가족 Id
     const [ searchText, setSearchText] = useState<string>("");               //## 장소 검색 Input Text
     const [ searchMessage, setSearchMessage] = useState<string>("");         //## 장소 검색 후 검색 결과 없을 시 메시지
@@ -71,7 +72,6 @@ const CarePlace = () => {
 
     }, []);
 
-    console.log("carePlaceList",carePlaceList[0])
 
         /**
      * 장소를 선택하고 기타 상세 주소를 입력 시 호출
@@ -364,10 +364,31 @@ const CarePlace = () => {
         }));
         if(detailPlaceType === "register") {
             navigate(`/care/write/register/0/${extendType}/${placeType}/${familyId}`)
+        }else { //### 공고 수정
+            let paramJobId = jobId > 0 ? `/${jobId}` : "";
+            navigate(`/care/detail/${jobId > 0 ? "edit" : "register"}/${extendType}/${placeType}/${familyId}${paramJobId}`);
         }
     }
 
-console.log("selectCarePlace",selectCarePlace)
+
+
+
+    /**
+     * 간병장소 선택 완료
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+    //  const completeCarePlace = () => {
+    //     dispatch(setCare({
+    //         ...selectCarePlace
+    //     }));
+
+    //     if (detailPlaceType === "register") { //### 공고 등록
+    //         navigate(`/care/write/register/0/${extendType}/${placeType}/${familyId}`);
+    //     } else { //### 공고 수정
+    //         let paramJobId = jobId > 0 ? `/${jobId}` : "";
+    //         navigate(`/care/detail/${jobId > 0 ? "edit" : "register"}/${extendType}/${placeType}/${familyId}${paramJobId}`);
+    //     }
+    // };
 
      /**
      * Set Map
@@ -519,7 +540,11 @@ console.log("selectCarePlace",selectCarePlace)
     };
 
 
-   
+    //##################################################################################################################
+    //##
+    //## >> Method : Default Rendering
+    //##
+    //##################################################################################################################
 
 
 
@@ -638,7 +663,7 @@ console.log("selectCarePlace",selectCarePlace)
                                     type="button" 
                                     className="btnColor"
                                     onClick={() => confirmCarePlace()}
-                                >다음</button>
+                                >{detailPlaceType === "register" ? "다음" : "적용"}</button>
                             </div>
                         }
                 </div>

@@ -77,7 +77,6 @@ const CareRenderCalendar = ({curDate, jobData, selectCareDate}: RenderTimeCalend
     // console.log("cal", moment("2022-07-08").month() + 1)
     // console.log("day",Utils.convertDateToString(moment("2022-07-15").add(29,"days")))
     // console.log( "date", Utils.convertDateToString(moment("2022-07-15").subtract(moment("2022-07-15").days(), "days")))
-    let testdate:any = (moment("2022-07-08"))
     // console.log(`"moment("2022-07-15").days()"`,new Date(moment("2022-07-08").year(), moment("2022-07-08").month(), testdate.format("DD")).getDay())
     // console.log("week",moment(testdate).week())
     // console.log(moment("2022-07-08").week() - moment("2022-07-08").week())

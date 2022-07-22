@@ -11,15 +11,15 @@
         content: "중환자실, 응급실, 격리병실, 폐쇄병실을<br/>제외한 병실입니다.",
     },
     {
-        img: "/images/sickRoom03.svg",
-        title: "중환자실",
-        content: "회복 가능성이 있는 위독한<br/>환자가 수용되는 병실입니다.",
-
-    },
-    {
         img: "/images/sickRoom02.svg",
         title: "응급실",
         content: "병원에서 응급실로<br/>지정한 병실입니다.",
+
+    },
+    {
+        img: "/images/sickRoom03.svg",
+        title: "중환자실",
+        content: "회복 가능성이 있는 위독한<br/>환자가 수용되는 병실입니다.",
 
     },
     {
@@ -68,7 +68,7 @@ export const careHelpInfo01 = [
     },
     {
         img: "/images/infectious07.svg",
-        title: "기타 감염성 질환",
+        title: "기타",
         content: ""
     },
     {
@@ -86,12 +86,16 @@ export const careHelpInfo02 = [
     {
         img: "/images/paralysis02.svg",
         title: "전신마비",
-        content: "전신의 근육이나 신경<br/>기능이 상실된 상태입니다."
+        content: "전신의 근육이나 신경<br/>기능이 상실된 상태입니다.",
+        detailTitle: "마비상태",
+        detailContent: "전신이 마비되었습니다."
     },
     {
         img: "/images/paralysis03.svg",
         title: "편마비",
-        content: "몸의 어느 한쪽이<br/>마비된 상태입니다."
+        content: "몸의 어느 한쪽이<br/>마비된 상태입니다.",
+        detailTitle: "마비상태",
+        detailContent: "반신이 마비되었습니다."
     }
 ];
 
@@ -103,17 +107,23 @@ export const careHelpInfo03 = [
     {
         img: "/images/behavior03.svg",
         title: "불가능",
-        content: "환자 스스로 거동이<br/>불가능하다면 선택하세요."
+        content: "환자 스스로 거동이<br/>불가능하다면 선택하세요.",
+        detailTitle: "거동상태",
+        detailContent: "거동이 불가능합니다."
     },
     {
         img: "/images/behavior02.svg",
         title: "부축 필요",
-        content: "환자가 거동하는데 부축이<br/>필요하다면 선택하세요."
+        content: "환자가 거동하는데 부축이<br/>필요하다면 선택하세요.",
+        detailTitle: "거동상태",
+        detailContent: "부축이 필요합니다."
     },
     {
         img: "/images/behavior01.svg",
         title: "스스로 가능",
-        content: "환자 스스로 거동이<br/>가능하다면 선택하세요."
+        content: "환자 스스로 거동이<br/>가능하다면 선택하세요.",
+        detailTitle: "거동상태",
+        detailContent: "거동이 가능합니다."
     }
 ];
 
@@ -125,7 +135,9 @@ export const careHelpInfo04 = [
     {
         img: "/images/pressure01.svg",
         title: "욕창",
-        content: "지속적인 압력을 받아 발생한<br/>압박 궤양을 보유한 상태입니다."
+        content: "지속적인 압력을 받아 발생한<br/>압박 궤양을 보유한 상태입니다.",
+        detailTitle: "욕창 유/무",
+        detailContent: "욕창환자입니다."
     }
 ];
 
@@ -137,12 +149,16 @@ export const careHelpInfo05 = [
     {
         img: "/images/consciousness01.svg",
         title: "의식있음",
-        content: "환자에게 의식이<br/>있다면 선택하세요."
+        content: "환자에게 의식이<br/>있다면 선택하세요.",
+        detailTitle: "의식 유/무",
+        detailContent: "의식이 있습니다."
     },
     {
         img: "/images/consciousness01.svg",
         title: "의식없음",
-        content: "환자에게 의식이<br/>없다면 선택하세요."
+        content: "환자에게 의식이<br/>없다면 선택하세요.",
+        detailTitle: "의식 유/무",
+        detailContent: "의식이 없습니다."
     }
 ];
 
@@ -154,12 +170,16 @@ export const careHelpInfo06 = [
     {
         img: "/images/recognition01.svg",
         title: "치매",
-        content: "인지 및 고등정신기능 등이<br/>떨어져 치매를 확진받은 상태입니다."
+        content: "인지 및 고등정신기능 등이<br/>떨어져 치매를 확진받은 상태입니다.",
+        detailTitle: "치매 유/무",
+        detailContent: "치매 환자입니다."
     },
     {
         img: "/images/recognition02.svg",
         title: "섬망",
-        content: "인식능력 저하로 불면증, 환각<br/>등을 느끼거나 공격적인 상태입니다."
+        content: "인식능력 저하로 불면증, 환각<br/>등을 느끼거나 공격적인 상태입니다.",
+        detailTitle: "섬망 유/무",
+        detailContent: "섬망 환자입니다."
     }
 ];
 
@@ -171,7 +191,9 @@ export const careHelpInfo07 = [
     {
         img: "/images/sleep01.svg",
         title: "수면장애",
-        content: "수술 후 통증, 불면증 등의 사유로<br/>깊은 잠에 들지 못하는 상태입니다."
+        content: "수술 후 통증, 불면증 등의 사유로<br/>깊은 잠에 들지 못하는 상태입니다.",
+        detailTitle: "수면장애 유/무",
+        detailContent: "수면장애 환자입니다."
     }
 ];
 
@@ -183,17 +205,23 @@ export const careHelpInfo08 = [
     {
         img: "/images/washroom03.svg",
         title: "이용 안함",
-        content: "환자가 화장실을<br/>이용하지 않는 경우, 선택하세요."
+        content: "환자가 화장실을<br/>이용하지 않는 경우, 선택하세요.",
+        detailTitle: "화장실 이용",
+        detailContent: "화장실을 이용하지 않습니다."
     },
     {
         img: "/images/washroom02.svg",
         title: "부축 필요",
-        content: "환자가 화장실을 이용하는데<br/>부축이 필요할 경우, 선택하세요."
+        content: "환자가 화장실을 이용하는데<br/>부축이 필요할 경우, 선택하세요.",
+        detailTitle: "화장실 이용",
+        detailContent: "부축이 필요합니다."
     },
     {
         img: "/images/washroom01.svg",
         title: "스스로 가능",
-        content: "환자가 화장실을 스스로<br/>이용이 가능하다면 선택하세요."
+        content: "환자가 화장실을 스스로<br/>이용이 가능하다면 선택하세요.",
+        detailTitle: "화장실 이용",
+        detailContent: "스스로 잘 이용하십니다."
     }
 ];
 
@@ -205,12 +233,16 @@ export const careHelpInfo09 = [
     {
         img: "/images/tool01.svg",
         title: "기저귀",
-        content: "환자가 기저귀를 사용하고<br/>있다면 선택하세요."
+        content: "환자가 기저귀를 사용하고<br/>있다면 선택하세요.",
+        detailTitle: "기저귀 사용",
+        detailContent: "기저귀를 사용 중입니다."
     },
     {
         img: "/images/tool02.svg",
         title: "소변줄",
-        content: "환자가 소변줄을 사용하고<br/>있다면 선택하세요."
+        content: "환자가 소변줄을 사용하고<br/>있다면 선택하세요.",
+        detailTitle: "소변줄 사용",
+        detailContent: "소변줄을 사용 중입니다."
     }
 ];
 
@@ -222,7 +254,9 @@ export const careHelpInfo10 = [
     {
         img: "/images/ostomy01.svg",
         title: "장루",
-        content: "환자가 인공항문을 사용하고<br/>있다면 선택하세요."
+        content: "환자가 인공항문을 사용하고<br/>있다면 선택하세요.",
+        detailTitle: "장루(인공항문) 환자",
+        detailContent: "인공항문을 사용중입니다."
     }
 ];
 
@@ -234,17 +268,23 @@ export const careHelpInfo11 = [
     {
         img: "/images/meal03.svg",
         title: "식사 안함",
-        content: "환자가 식사를 <br/>하지 않는 경우, 선택하세요."
+        content: "환자가 식사를 <br/>하지 않는 경우, 선택하세요.",
+        detailTitle: "식사",
+        detailContent: "식사를 하지 않습니다."
     },
     {
         img: "/images/meal02.svg",
         title: "도움 필요",
-        content: "환자가 식사를 하는데<br/>도움이 필요할 경우, 선택하세요."
+        content: "환자가 식사를 하는데<br/>도움이 필요할 경우, 선택하세요.",
+        detailTitle: "식사",
+        detailContent: "움 필요합니다."
     },
     {
         img: "/images/meal01.svg",
         title: "스스로 가능",
-        content: "환자가 식사를 스스로 하는게<br/>가능하다면 선택하세요."
+        content: "환자가 식사를 스스로 하는게<br/>가능하다면 선택하세요.",
+        detailTitle: "식사",
+        detailContent: "스스로 가능합니다."
     }
 ];
 
@@ -256,7 +296,9 @@ export const careHelpInfo12 = [
     {
         img: "/images/suction01.svg",
         title: "석션",
-        content: "환자가 석션 기계를 사용하고<br/>있다면 선택하세요."
+        content: "환자가 석션 기계를 사용하고<br/>있다면 선택하세요.",
+        detailTitle: "석션 이용 유/무",
+        detailContent: "석션 이용 중 입니다."
     }
 ];
 
@@ -268,7 +310,9 @@ export const careHelpInfo13 = [
     {
         img: "/images/feeding01.svg",
         title: "피딩",
-        content: "환자가 튜브를 체내에 삽입하여<br/>영양을 공급받는다면 선택하세요."
+        content: "환자가 튜브를 체내에 삽입하여<br/>영양을 공급받는다면 선택하세요.",
+        detailTitle: "튜브삽입 중 (피딩)",
+        detailContent: "튜브를 삽입 중 입니다."
     }
 ];
 
@@ -280,7 +324,9 @@ export const careHelpInfo14 = [
     {
         img: "/images/rehabilitation01.svg",
         title: "재활치료 중",
-        content: "환자가 재활치료 중이라면<br/>선택하세요."
+        content: "환자가 재활치료 중이라면<br/>선택하세요.",
+        detailTitle: "재활치료 환자",
+        detailContent: "재활치료 중 입니다."
     }
 ];
 
@@ -292,7 +338,9 @@ export const careHelpInfo15 = [
     {
         img: "/images/dialysis01.svg",
         title: "투석 치료 중",
-        content: "환자가 투석 치료 중이라면<br/>선택하세요."
+        content: "환자가 투석 치료 중이라면<br/>선택하세요.",
+        detailTitle: "투석치료 환자",
+        detailContent: "투석치료 중 입니다."
     }
 ];
 
@@ -302,9 +350,21 @@ export const careHelpInfo15 = [
  */
 export const careHelpInfo16 = [
     {
-        img: "/images/gender01.svg",
+        img: "/images/gender02.svg",
         title: "우대하는 케어메이트 성별",
-        content: "케어메이트가 참고하도록<br/>우대하는 케어메이트 성별을 선택하세요."
+        content: "케어메이트가 참고하도록<br/>우대하는 케어메이트 성별을 선택하세요.",
+        detailTitle: "우대하는 케어메이트 성별",
+        detailContent: "남자"
+    },
+    {
+        img: "/images/gender03.svg",
+        detailTitle: "우대하는 케어메이트 성별",
+        detailContent: "여자"
+    },
+    {
+        img: "/images/gender01.svg",
+        detailTitle: "우대하는 케어메이트 성별",
+        detailContent: "상관없음"
     }
 ];
 
@@ -316,6 +376,6 @@ export const careHelpInfo17 = [
     {
         img: "/images/uniform.svg",
         title: "선호하는 케어메이트 복장",
-        content: "케어메이트가 참고하도록<br/>선호하는 케어메이트 복장을 선택하세요."
-    }
+        content: "케어메이트가 참고하도록<br/>선호하는 케어메이트 복장을 선택하세요.",
+    },
 ];

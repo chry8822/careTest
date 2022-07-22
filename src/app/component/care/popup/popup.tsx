@@ -26,7 +26,6 @@ const ExtendTypePopup = () => {
         setPlaceType(popup.content) 
     },[extendType,placeType])
 
-    console.log(extendType)
 
     
     //##################################################################################################################

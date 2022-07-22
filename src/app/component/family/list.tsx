@@ -86,7 +86,6 @@ const CareFamily = () => {
     const renderPatientList = useMemo(() => {
         let html:any[] = [];
         familyList.forEach((item:any, idx:number) => {
-            console.log("index",idx)
             html.push(
                 <li className="radioSelect__box">
                     <div className="radioSelect__box--inputWrap">
@@ -182,7 +181,6 @@ const CareFamily = () => {
                                 className={`btnColor ${selectListItem <= 0 && " disabled"}`}
                                 disabled={selectListItem <= 0}
                                 onClick={()=>{
-                                    console.log("clicked")
                                 }}
                             >다음</button>
                         </div>

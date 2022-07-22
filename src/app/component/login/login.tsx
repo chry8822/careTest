@@ -91,12 +91,11 @@ const Login = () => {
           if(response.status === 200) {
             let data = response.data;
             if (data.code === 200) {
-              console.log("로그인 성공")
               LocalStorage.setStorage(LocalStorage.AUTHORIZATION, data.data.token_type + " " + data.data.access_token);
               LocalStorage.setStorage(LocalStorage.USER_ID, data.data.user.id);
 
               Utils.getRSAPublicKeyApi(data.data.token_type + " " + data.data.access_token, data.data.user.id, function (flag: boolean) {
-                navigate("/")
+              navigate("/")
             });
               // navigate("/")
             } else {

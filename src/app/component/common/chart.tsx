@@ -49,12 +49,15 @@ const Piechart = ({graph}:PieChartProps) => {
                     enableArcLabels={false}
                     enableArcLinkLabels={false}
                     colors={{ datum: 'data.color' }}
+                    data ={chartData}
+                    innerRadius={0.5}
+                    padAngle={0}
+                    cornerRadius={0}
                     //  data 에 명시한 컬러를 사용할때 datum : data.color 로 설정시 데이터 안에 color 순서대로 출력 
 
                     /**
                      * chart에 사용될 데이터
                      */
-                    data ={chartData}
                     /**
                      * chart margin
                      */
@@ -62,15 +65,12 @@ const Piechart = ({graph}:PieChartProps) => {
                     /**
                      * chart 중간 빈공간 반지름
                      */
-                    innerRadius={0.5}
                     /**
                      * pad 간격
                      */
-                    padAngle={0}
                     /**
                      * pad radius 설정 (pad별 간격이 있을 시 보임)
                      */
-                    cornerRadius={0}
                     /**
                      * chart 색상
                      */

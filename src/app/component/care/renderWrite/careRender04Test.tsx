@@ -26,8 +26,6 @@ const CareRender04test = ({ registerData, setData }: CareRender00Props) => {
             checkedNum.includes(`infectious03`) && checked && e.target.checked,
         ]
 
-        console.log(testArr)
-        console.log(checkedNum)
         if(checkedNum.includes(`infectious0${id}`)){
           testArr.filter((i) => i !== `infectious0${id}`)
         }else {

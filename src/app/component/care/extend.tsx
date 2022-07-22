@@ -55,7 +55,6 @@ const CareExtend = () => {
      */
      const popupAction = (type: string) => {
         dispatch(hidePopup())
-        console.log("팝엎비잗거ㅣㅏㅓㅇㄹ")
         if(extendType === "timeCare01" || extendType === "timeCare02") {
             let jobType = extendType === "timeCare01" ? "time" : "day";
             let requestType = placeType === "placeCare01" ? "hospital" : "home";

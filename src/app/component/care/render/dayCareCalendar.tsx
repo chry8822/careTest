@@ -83,8 +83,6 @@ const RenderDayCalendar = ({curDate, setCurDate, jobData, dateFlag}: RenderCalen
     let date:any = moment([year, month, 1]);
     
 
-    // console.log("test2",date.add(1,"d"))
-    // console.log("test3",date.add(2,"d"))
     
     /**
      * 달력 날짜 Rendering

@@ -423,7 +423,7 @@ export function jobStatusColor(list: any) {
     */
     let colorName;
     if (list.status === 1 || list.status === 2 || list.status === 3) {
-        colorName = "YW";
+        colorName = "YL";
     } else if (list.status === 4) {
         colorName = "BU";
     } else if (list.status === 5) {

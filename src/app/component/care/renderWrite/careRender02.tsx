@@ -33,7 +33,6 @@ const CareRender02 = ({ registerData, setData }: CareRender00Props) => {
         }
     };
 
-    console.log(registerData.diagnosis)
 
     //##################################################################################################################
     //##

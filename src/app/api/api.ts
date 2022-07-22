@@ -1,7 +1,8 @@
-import axios from 'axios';
+import axios, { AxiosRequestHeaders } from 'axios';
 import * as LocalStorage from '../constants/localStorage'
 import * as Utils from '../constants/utils'
 import Header from './../component/common/header';
+import React,{useCallback,useMemo} from 'react';
 
 const apiBasePrefix = "https://ci_api3.carenation.kr"
 const apiPrefix = "/v3_0"
@@ -20,17 +21,52 @@ const SIGN_UP_BAD_WORDS_API = "/badwords";
 const BAD_WORDS_API = "/bad_words"
 const USER_INFO_API = "/my-page"; 
 const JOB_GRAPH = "/job/graph";       
+const JOB_API = "/job"; 
+const JOB_CANCEL_API = "/job/cancel";    
 
-let auth = LocalStorage.getStorage(LocalStorage.AUTHORIZATION) || "";
 
-const apiAxios = axios.create({
+// string || null 타입
+// const getAuthHeader = () => {
+//     if(Utils.isEmpty(LocalStorage.AUTHORIZATION)){
+//         return "";
+//     }else{
+//         return LocalStorage.getStorage(LocalStorage.AUTHORIZATION)
+//     }
+// }
+
+
+const getMD5Header = (type?: string): AxiosRequestHeaders => {
+    if (type === 'TRUE'){
+        return {
+            'Content-Type': 'text/plain',
+            'User-Content-Type': Utils.md5(),
+            'Authorization':getAuth(),
+        } 
+    }else {
+        return {
+            'UserType': 'protector',
+            'AppVersion': '1.0.0',
+            'Content-Type': 'application/json',
+            'UserAgent': SERVER_TYPE ? SERVER_TYPE : "",
+            'Authorization':getAuth()
+        }
+    }
+}
+
+
+// string
+const getAuth = () => {
+    return LocalStorage.getStorage(LocalStorage.AUTHORIZATION) || ""
+}
+
+export const apiAxios = axios.create({
    timeout: 30000,
    headers: {
        'Content-Type': 'application/json',
        'UserAgent': SERVER_TYPE ? SERVER_TYPE : "",
        'UserType': 'protector',
        'AppVersion': '1.0.0',
-       'Authorization': auth
+       'Authorization': getAuth()
    }
 })
 
@@ -41,31 +77,16 @@ function baseApi(apiUrl: string = "") {
 }
 
 
-// api 데이터 상태 체크
 function successStatusCheck(response: any, resolve: any) {
-    let hkey: string = response.headers['hkey'];
-    let htime: string = response.headers['htime'];
-    let data: string = JSON.stringify(response.data);
-
-    if (hkey !== "qodkvmn1k431k3m4n1k08alk2mn59kaskfld8734kj324kjb2mnb324mnb2341a") {
-        const sha256 = require('sha256');
-        let result = sha256(htime + data);
-
-        if (result !== hkey && !response.config.baseURL.includes("datalab")) {
-            response.data = {
-                code: 600,
-                message: "데이터 위변조가 이루어졌습니다.<br/>다시 시도해주세요."
-            };
-        }
-    }
     if (response.status === 200) {
         resolve(response);
     } else if (response.status === 401) {
-        console.log(response.status)
+        moveMain();
     } else {
         resolve('error');
     }
 }
+
 
 function failStatusCheck(err: any, reject: any) {
     if (err.response && err.response.status === 401) {
@@ -89,7 +110,7 @@ export function mainList () {
                 method: "get",
                 url: baseApi(apiCarePrefix) + MAIN_API,
                 headers: {
-                    "Authorization": auth, 
+                    "Authorization": getAuth(), 
                     'Content-Type': 'application/json',
                     'UserAgent': SERVER_TYPE ? SERVER_TYPE : "",
                     'UserType': 'protector',
@@ -104,35 +125,22 @@ export function mainList () {
     })        
 }
 
-// export function mainList () {
-//     return new Promise ((resolve, reject) => {
-//         axios.get(baseApi(apiCarePrefix) + MAIN_API, { headers : getAccessTokenHeader() } )
-//             .then((response) => {
-//                 successStatusCheck(response,resolve)
-//             }).catch((err) => {
-//                 console.log(err, reject)
-//             })    
-//     })
-// }
-
-
 /**
  * 메인 최저가 현황
  * -----------------------------------------------------------------------------------------------------------------
  */
 
 export function lowestPriceList () {
-    console.log("최저가 auth", auth)
     return new Promise ((resolve, reject) => {
             axios({
                 method: "get",
                 url: "https://ci_api3.carenation.kr/v3_0/protector"  + LOWEST_PRICE_API,
                 headers: {
-                    'Authorization': auth,
                     'Content-Type': 'application/json',
                     'UserAgent': "CI",
                     'UserType': 'protector',
                     'AppVersion': '1.0.0',
+                    'Authorization': getAuth()
                 }
             })    
             .then((response) => {
@@ -150,19 +158,12 @@ export function lowestPriceList () {
 
 export function login(data: any, userId: string) {
     return new Promise ((resolve, reject) => {
-            axios({
+            apiAxios({
             method: "post",
             url: baseApi(apiCarePrefix) + LOGIN_API + '/' + userId ,
             data:{
                 ...data
-                // email: data.email,
-                // password: data.password
             },
-            headers: {
-                'UserAgent':  "CI",
-                'UserType': 'protector',
-            }
-
         })
         .then((response) => {
             successStatusCheck(response,resolve)
@@ -220,7 +221,13 @@ export function getRSAPublicKey() {
         apiAxios({
             method: "get",
             url: baseApi() + '/' + GET_RSA_PUBLIC_KEY_API ,
-            headers: {"Authorization": auth}
+            headers: {
+                'Authorization': getAuth(),
+                'Content-Type': 'application/json',
+                'UserAgent': "CI",
+                'UserType': 'protector',
+                'AppVersion': '1.0.0',
+            }
         })
         .then((response) => {
             successStatusCheck(response,resolve)
@@ -244,7 +251,7 @@ export function patientList () {
                 'UserType': 'protector',
                 'Content-Type': 'application/json',
                 'UserAgent': SERVER_TYPE ? SERVER_TYPE : "",
-                'Authorization': auth
+                'Authorization': getAuth()
             }
         }).then((response) => {
             successStatusCheck(response, resolve)
@@ -266,7 +273,7 @@ export function patientDetail(familyId: number) {
         axios({
             method:"get",
             url: baseApi(apiCarePrefix) + PATIENTS + familyId,
-            headers: {"Authorization": auth}
+            headers: {"Authorization": getAuth()}
         }).then((response) => {
             successStatusCheck(response, resolve)
         }).catch(err => {
@@ -295,21 +302,7 @@ export function patientDetail(familyId: number) {
                 data: {
                     ...data
                 },
-                headers :
-                ENCRYPTION_TYPE === "TRUE" ?
-                {   
-                    'Content-Type': 'text/plain',
-                    'User-Content-Type': Utils.md5(),
-                    'Authorization': auth ? auth : ""
-                }
-                :
-                {
-                    'UserType': 'protector',
-                    'AppVersion': '1.0.0',
-                    'Content-Type': 'application/json',
-                    'UserAgent': SERVER_TYPE ? SERVER_TYPE : "",
-                    'Authorization': auth
-                }
+                headers: getMD5Header(ENCRYPTION_TYPE)
             })
             .then((response) => {
                 successStatusCheck(response, resolve)
@@ -333,7 +326,7 @@ export function userInfo(){
             method:"get",
             url: "https://ci_api3.carenation.kr/v3_0" + USER_INFO_API,
             headers: {
-                'Authorization': auth,
+                'Authorization': getAuth(),
                 'UserType': 'protector',
                 'AppVersion': '1.0.0',
                 'Content-Type': 'application/json',
@@ -362,7 +355,7 @@ export function careDetail(jobId: number) {
             method: "get",
             url: baseApi(apiCarePrefix) + "/job"+ '/' +  jobId,
             headers: {
-                'Authorization': auth,
+                'Authorization': getAuth(),
                 'UserType': 'protector',
                 'AppVersion': '1.0.0',
                 'Content-Type': 'application/json',
@@ -389,7 +382,7 @@ export function jobGraph(params:any) {
             method: "get",
             url: baseApi(apiCarePrefix) + JOB_GRAPH,
             headers: {
-                'Authorization': auth,
+                'Authorization': getAuth(),
                 'UserType': 'protector',
                 'AppVersion': '1.0.0',
                 'Content-Type': 'application/json',
@@ -406,5 +399,213 @@ export function jobGraph(params:any) {
     })
 }
 
-export default {lowestPriceList, mainList,login,addressList,hospitalListNew,getRSAPublicKey,patientDetail,badwordsCheck,userInfo,careDetail,jobGraph,patientList } 
+
+/**
+ * 가족 정보 등록
+ * -----------------------------------------------------------------------------------------------------------------
+ */
+
+            
+
+export function patientRegister(data: any) {
+    return new Promise((resolve, reject) => {
+        axios({
+            method:"post",
+            url: baseApi(apiCarePrefix) + PATIENTS,
+            data:{
+                ...data
+            },
+            headers: getMD5Header(ENCRYPTION_TYPE)
+            }) .then((response) => {
+                successStatusCheck(response, resolve)
+            }).catch(err => {
+                failStatusCheck(err, reject)
+            });
+        }
+    )
+}
+
+/**
+ * 공고 등록
+ * -----------------------------------------------------------------------------------------------------------------
+ *
+ * @param data : Object Data
+ */
+
+export function jobRegister(data: any) {
+    return new Promise((resolve, reject)=> {
+        axios({
+            method:"post",
+            url: baseApi(apiCarePrefix) + JOB_API,
+            data:{
+                ...data
+            },
+            headers: getMD5Header(ENCRYPTION_TYPE)
+        }).then((response) => {
+            successStatusCheck(response, resolve)
+        }).catch(err => {
+            failStatusCheck(err, reject)
+        });
+    })
+}
+
+/**
+ * 공고 수정
+ * -----------------------------------------------------------------------------------------------------------------
+ *
+ * @param jobId : 공고 Id
+ * @param data : Object Data
+ */
+
+
+export function jobEdit(jobId: number, data: any) {
+    return new Promise((resolve,reject) => {
+        axios({
+            method:"post",
+            url: baseApi(apiCarePrefix) + JOB_API + '/' + jobId,
+            data: {
+                ...data
+            },
+            headers: getMD5Header(ENCRYPTION_TYPE)
+        }).then((response) => {
+            successStatusCheck(response, resolve)
+        }).catch(err => {
+            failStatusCheck(err, reject)
+        });
+    })
+}
+/**
+ * 가족 정보 수정
+ * -----------------------------------------------------------------------------------------------------------------
+ */
+
+export function patientEdit(patientId: number, data: any) {
+    console.log("공고 등록")
+    return new Promise((resolve, reject)=> {
+        axios({
+            method:"post",
+            url:baseApi(apiCarePrefix) + PATIENTS + `/${patientId}`,
+            data: {
+                ...data
+            },
+            headers: getMD5Header(ENCRYPTION_TYPE)
+        }).then((response) => {
+            successStatusCheck(response, resolve)
+        }).catch(err => {
+            failStatusCheck(err, reject)
+        });
+    })
+}
+
+
+
+/**
+ * 간병 내역 가져오기
+ * -----------------------------------------------------------------------------------------------------------------
+ *
+ * @param params : Object params
+ */
+
+export function jobList(params: any) {
+    return new Promise((resolve, reject) => {
+        axios({
+            method:"get",
+            url: baseApi(apiCarePrefix) + JOB_API,
+            params:{
+                ...params
+            },
+            headers: {
+                'UserType': 'protector',
+                'AppVersion': '1.0.0',
+                'Content-Type': 'application/json',
+                'UserAgent': SERVER_TYPE ? SERVER_TYPE : "",
+                'Authorization': getAuth()
+            }
+        })  .then((response) => {
+            successStatusCheck(response, resolve)
+        }).catch(err => {
+            failStatusCheck(err, reject)
+        });
+    })
+}
+
+
+/**
+ * 공고 취소
+ * -----------------------------------------------------------------------------------------------------------------
+ *
+ * @param jobId : 공고 Id
+ * @param deletedType : 취소 사유
+ */
+export function jobDelete(jobId:number, deletedType?: number) {
+    return new Promise((resolve, reject) => {
+        axios({
+            method:"delete",
+            url:baseApi(apiCarePrefix) + JOB_API + `/${jobId}${Utils.isEmpty(deletedType) ? '' : '/' + deletedType}`,
+            headers:{
+                'Content-Type': 'application/json',
+                'UserAgent': SERVER_TYPE ? SERVER_TYPE : "",
+                'UserType': 'protector',
+                'AppVersion': '1.0.0',
+                'Authorization': getAuth()
+            }
+        }).then((response) => {
+            successStatusCheck(response, resolve)
+        }).catch(err => {
+            failStatusCheck(err, reject)
+        });
+    })
+}
+
+
+/**
+ * 공고 취소 요청
+ * -----------------------------------------------------------------------------------------------------------------
+ *
+ * @param jobId : 공고 Id
+ * @param deletedType : 취소 사유
+ */
+
+export function jobCancel(jobId:number, deletedType?: number) {
+    return new Promise((resolve, reject) => {
+        axios({
+            method:"delete",
+            url:baseApi(apiCarePrefix) + JOB_CANCEL_API + `/${jobId}/${deletedType}`,
+            headers:{
+                'Content-Type': 'application/json',
+                'UserAgent': SERVER_TYPE ? SERVER_TYPE : "",
+                'UserType': 'protector',
+                'AppVersion': '1.0.0',
+                'Authorization': getAuth()
+            }
+        }).then((response) => {
+            successStatusCheck(response, resolve)
+        }).catch(err => {
+            failStatusCheck(err, reject)
+        });
+    })
+}
+
+
+export default {
+    lowestPriceList,
+    mainList,
+    login,
+    addressList,
+    hospitalListNew,
+    getRSAPublicKey,
+    patientDetail,
+    badwordsCheck,
+    userInfo,
+    careDetail,
+    jobGraph,
+    patientList,
+    patientRegister,
+    jobRegister,
+    jobEdit,
+    patientEdit,
+    jobList,
+    jobDelete,
+    jobCancel
+ } 
 

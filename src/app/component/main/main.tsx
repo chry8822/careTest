@@ -44,8 +44,419 @@ const Main = () => {
     const [countUpCheck, setCountUpCheck] = useState<boolean>(false) // ## 누적 데이터 카운트업 시작 체크
 
     useEffect(() => {
+        Utils.clearHistory();
         mainListApi()
     }, [])
+
+
+
+
+
+
+    //##################################################################################################################
+    //##
+    //## >> Method : private
+    //##
+    //##################################################################################################################
+
+    /**
+     * 후기 작성 시간 비교
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    const reviewCreatedDate = (time:any) => {
+        let currentTime = moment();
+        let createdTime = moment(time);
+        let reviewDate = currentTime.diff(createdTime, "days") + 1;
+        return reviewDate
+    }
+
+    /**
+     * 최저가현황 카운트다운 Check
+     * -----------------------------------------------------------------------------------------------------------------
+     *
+     * @param position : index
+     * @param dateTime : 마감 시간 (expired_at)
+     */
+         const lowestPriceCountDown = (position: number, dateTime: string) => {
+            let tempLowestPriceJobCountDownList = lowestPriceJobCountDownList;
+    
+            let t1 = moment(dateTime).add(1, 'minutes');
+            let t2 = moment();
+            let flag = moment.duration(t1.diff(t2)).asDays() >= 1;
+    
+            tempLowestPriceJobCountDownList[position] = (flag ? 24 : moment.duration(t1.diff(t2)).hours()) + "시간 " + moment.duration(t1.diff(t2)).minutes() + "분 " + moment.duration(t1.diff(t2)).seconds() + "초";
+            setLowestPriceJobCountDownList(lowestPriceJobCountDownList.concat(tempLowestPriceJobCountDownList));
+    
+            if (moment.duration(t1.diff(t2)).seconds() < 0) {
+                lowestPriceJobListApi(mainData);
+            }
+        };
+
+    /**
+     * 간병장소 선택
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    const carePlaceSelect = () => {
+    let eventToken = Utils.isAuthCheck() ? "eplqfg" : "kbmp4x"; //## Adjust Event Token
+    let eventType = Utils.isAuthCheck() ? "care_req_g" : "care_req_m"; //## Analytics Event Type
+
+    //### 간병서비스 신청하기
+    Utils.adjustEvent(eventToken);
+    Utils.analyticsEvent(eventType);
+
+    if(Utils.isAuthCheck()){
+        dispatch(showPopup({element:Popup,action:popupAction,actionType:"login",btnType:"two"}))
+        return
+    }
+    
+    //### 작성 중인 공고 있을 때 공고 불러오기 팝업 호출
+    if (LocalStorage.getStorage(LocalStorage.LOAD_WRITE_DATA)) {
+        dispatch(showPopup({element:LoadWritePopup, action:popupAction,type:"popup", actionType:"load"}));
+    } else {
+        if (mainData.patientsCnt === 0) {
+            navigate("/care/select");
+        } else {
+            navigate("/care/family/list");
+        }
+    }
+
+
+    }
+
+
+    /**
+     * 최저가 현황 마감시간 카운트 다운 처리
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+    useEffect(() => {
+        if (mainData.lowestPriceJobList.length > 0) {
+            const interval = setInterval(() => {
+                for (let i = 0; i < mainData.lowestPriceJobList.length; i++) {
+                    if (!Utils.isEmpty(mainData.lowestPriceJobList[i].expired_at)) {
+                        lowestPriceCountDown(i, mainData.lowestPriceJobList[i].expired_at);
+                    }
+                }
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [mainData.lowestPriceJobList]);
+
+    /**
+     * 최저가 현황 리스트 -> 공고 상세 페이지 이동
+     * -----------------------------------------------------------------------------------------------------------------
+     *
+     * @param job : Object Data
+     * @param tabPosition : Tab Position
+    */
+         const moveJobDetail = (job: any, tabPosition: number) => {
+            navigate(`/care/detail/view/${job.job_type}/${job.request_type}/${job.ptr_patients_id}/${job.id}?tab=${tabPosition}`);
+        };
+    
+    
+        
+    
+    /**
+     * CountUP 감시 (observer intersection)
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    const observerRef = useRef(null);
+
+    useEffect(() => {
+        if (!countUpCheck) {
+            window.scrollTo(0, 0)
+        }
+        if (observerRef.current) {
+            let options = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0
+            }
+
+            const observer = new IntersectionObserver(callback, options);
+            observer.observe(observerRef.current)
+        }
+    }, [observerRef.current])
+
+    const callback = useCallback((entries: any, observer: any) => {
+        entries.forEach((entry: any) => {
+            if (entry.intersectionRatio) {
+                observer.unobserve(observerRef.current);
+                setCountUpCheck(true)
+            }
+        });
+    }, [mainData.careUseList, countUpCheck])
+    
+    
+
+
+    //##################################################################################################################
+    //##
+    //## >> Method : Render
+    //##
+    //##################################################################################################################
+
+    /**
+     * 메인 베너 렌더링
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+    const renderMainbanner = () => {
+        return (
+            <Swiper
+                spaceBetween={30}
+                slidesPerView={1}
+                className="mySwiper"
+                loop={true}
+                autoplay={{ delay: 2500 }}
+                onSlideChange={(e) => {
+                    setMainBannerPosition(e.realIndex + 1)
+                }}
+                allowTouchMove={true}
+            >
+                <SwiperSlide>
+                    <article className="mainInsur">
+                        <p className="txtStyle05-C333">국내 최초 보험 가입 자동화</p>
+                        <h2 className="txtStyle01">
+                            삼성화재<br />
+                            간병인배상책임보험 출시
+                        </h2>
+                        <img src="../images/mainInsurLogo.svg" alt="케어네이션 x 삼성화재" />
+                    </article>
+                </SwiperSlide>
+                <SwiperSlide>
+                    <article className="mainImg">
+                        <div className="mainImg__txt">
+                            <img src="../images/loginTit.svg" alt="대한민국 1등 간병앱" />
+                            <h2 className="txtStyle01">
+                                <strong>서울</strong>에서 <strong>제주</strong>까지<br />
+                                24시간 <strong>실시간</strong> 매칭 중!
+                            </h2>
+                            <p className="txtStyle05-C333">가장 많은 간병인이 선택했어요!</p>
+                        </div>
+                    </article>
+                </SwiperSlide>
+                <SwiperSlide>
+                    <article className="careMateBan"></article>
+                </SwiperSlide>
+            </Swiper>
+        )
+    }
+
+
+    /**
+     * 최저가 지원 현황 렌더링
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+
+    const renderLowstPriceApply = () => {
+        let html: any[] = [];
+        mainData.lowestPriceJobList.map((item: any, idx: any) => {
+            // if (idx !== 0) {
+                html.push(
+                    <li 
+                        key={idx}
+                        onClick={()=> {
+                            navigate(`/care/detail/view/${item.job_type}/${item.request_type}/${item.ptr_patients_id}/${item.id}?tab=1`)
+                        }}
+                    >
+                        {/* <a href=""  onClick={() => moveJobDetail(item, 1)}> */}
+                        <img
+                            src={item.job_type === "day" ? "/images/timeCareUpLabel.svg" : "/images/timeCareDownLabel.svg"}
+                            alt="시간제 간병"
+                            className="timeCareLabel"
+                            onError={Utils.imgSrcError}
+                        />
+                        <div className="Job__list--label">
+                            {
+                                !Utils.isEmpty(item.expired_at) &&
+                                <span className="label RD">
+                                    마감{lowestPriceJobCountDownList[0] ? lowestPriceJobCountDownList[0] : "진행중"}
+                                </span>
+                            }
+                            <span className="label GY">
+                                지원한 케어메이트 : {Utils.numberWithCommas(item.applicant_count)}명
+                            </span>
+                        </div>
+                        <dl className="Job__list--info">
+                            <div>
+                                <dt>간병일</dt>
+                                <dd>{moment(item.job_start_date).format("MM월 DD일 HH시")}</dd>
+                            </div>
+                            <div>
+                                <dt>현재 최저가</dt>
+                                {
+                                    item.job_type === "day" ?
+                                        <dd>
+                                            {Utils.numberWithCommas(item.applicant_min_amount.amount_day_fee)}원
+                                        </dd>
+                                        :
+                                        <dd>
+                                            {Utils.numberWithCommas(item.applicant_min_amount.amount_time_fee)}원
+                                        </dd>
+                                }
+                            </div>
+                        </dl>
+                        {/* </a> */}
+                    </li>
+                )
+            // }
+        })
+        return html;
+    }
+
+
+   /**
+     * 보호자 후기 렌더링
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    const renderReview = () => {
+        let settings = {
+            infinite: true,
+            autoplaySpeed: 1000,
+            slidesToShow: 5,
+            slidesToScroll: 1,
+            autoplay: true,
+            vertical: true,
+            arrows: false,
+            touchMove: false
+        };
+        return (
+            <Slider {...settings}>
+                {reviewList}
+            </Slider>
+        )
+    }
+
+
+    const reviewList = useMemo(() => {
+
+        let listData: any[] = [];
+        if (Utils.isEmpty(mainData.mainReviewList) || mainData.mainReviewList.length === 0) {
+            return listData;
+        }
+
+        mainData.mainReviewList.forEach((item: any, index: any) => {
+            listData.push(
+                <a key={index}>
+                    <div className="mainRev__link--tit">
+                        {
+                            Utils.isEmpty(item.prt_user) ?
+                                <h3 className="txtStyle05-Wbold"><span className="txtStyle06-C777W500">탈퇴한 보호자</span></h3>
+                                :
+                                <h3 className="txtStyle05-Wbold">{item.prt_user.name}<span className="txtStyle06-C777W500">보호자</span></h3>
+                        }
+                        <time className="txtStyle06-C777">{reviewCreatedDate(item.created_at)}일 전</time>
+                    </div>
+                    <figure className="ratingGroup">
+                        <img src="../images/reviewStar03.svg" alt="종합평점" />
+                        <figcaption className="txtStyle05">{item.rating.toFixed(1)}</figcaption>
+                    </figure>
+                    <div className="mainRev__link--txt">
+                        <span className="txtStyle06-C333">{Utils.isEmpty(item.cgs_user) ? "탈퇴한 케어메이트에게" : item.cgs_user.name + " 케어메이트에게"}</span>
+                        <p className="txtStyle04-C333">{item.content}</p>
+                    </div>
+                </a>
+            )
+        });
+        return listData;
+    }, [mainData.mainReviewList]);
+
+
+    /**
+     * 케어네이션 이용 현황 카운트 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+     const renderUsageCount = useMemo(() => {
+        let html: any[] = [];
+        html.push(
+            <React.Fragment key={Math.random()}>
+                <dl className="mainItemWrap__history--list">
+                    <div>
+                        <dt>누적 이용 건수</dt>
+                        <dd><CountUp totalNumber={mainData.careUseList.jobCnt} countUpCheck={countUpCheck} /></dd>
+                    </div>
+                    <div>
+                        <dt><span><CountUp totalNumber={mainData.careUseList.jobCareTimeYear} countUpCheck={countUpCheck} /></span></dt>
+                        <dd>누적 간병시간</dd>
+                    </div>
+                </dl>
+                <div className="mainItemWrap__history--acc">
+                    <h3 className="txtStyle04-C333Wnoml">누적 승인 금액</h3>
+                    <p className="txtStyle03-Bold"><CountUp totalNumber={mainData.careUseList.accumulatedAmount} countUpCheck={countUpCheck} /></p>
+                </div>
+            </React.Fragment>
+        );
+        return html;
+    }, [mainData.careUseList, countUpCheck]);
+
+    /**
+     * 실시간 케어메이트 소식 Rendering
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    //  랜덤으로 나타남
+    //  노란색 : mainNews__list--YL
+    //  초록색 : mainNews__list--GR
+    //  파란색 : mainNews__list--BL
+
+    const renderCareMate = () => {
+        return (
+            <Slider
+                autoplay={true}
+                autoplaySpeed={1000}
+                arrows={false}
+                infinite={true}
+                touchMove={false}
+                slidesToShow={1}
+            >
+                {
+                    mainData.applicantList.map((item: any, index: any) => {
+                        return (
+                            <article className=
+                                {
+                                    "mainNews__list--" +
+                                    (index < 6 ?
+                                        (index % 3 === 0 ? "YL" : (index % 3 === 1 ? "GR" : "BL"))
+                                        :
+                                        (index % 3 === 0 ? "GR" : (index % 3 === 1 ? "BL" : "YL")))
+                                }>
+                                <h3 className="txtStyle03-Wnoml">
+                                    보호자 <strong>{item.name}님</strong> 공고에<br />
+                                    <strong>케어메이트 지원 완료!</strong>
+                                </h3>
+                                <p className="txtStyle04-C555Wnoml">
+                                    {item.loc}
+                                </p>
+                                <div>
+                                    <span className="txtStyle06-W500">총 지원</span>
+                                    <p className="txtStyle01-Wbold">{Utils.numberWithCommas(item.cnt)}명</p>
+                                </div>
+                            </article>
+                        )
+                    })
+                }
+            </Slider>
+        )
+    }
+
+
+    
+    //##################################################################################################################
+    //##
+    //## >> Method : Api
+    //##
+    //##################################################################################################################
+
+
+
+    /**
+     * 메인 리스트 Api
+     * -----------------------------------------------------------------------------------------------------------------
+     */
 
     const mainListApi = () => {
         Api.mainList().then((response: any) => {
@@ -99,31 +510,7 @@ const Main = () => {
             dispatch(showPopup({ element: Popup, action: popupAction }));
         })
     }
-
-
-
-    /**
-     * 최저가현황 카운트다운 Check
-     * -----------------------------------------------------------------------------------------------------------------
-     *
-     * @param position : index
-     * @param dateTime : 마감 시간 (expired_at)
-     */
-    const lowestPriceCountDown = (position: number, dateTime: string) => {
-        let tempLowestPriceJobCountDownList = lowestPriceJobCountDownList;
-
-        let t1 = moment(dateTime).add(1, 'minutes');
-        let t2 = moment();
-        let flag = moment.duration(t1.diff(t2)).asDays() >= 1;
-
-        tempLowestPriceJobCountDownList[position] = (flag ? 24 : moment.duration(t1.diff(t2)).hours()) + "시간 " + moment.duration(t1.diff(t2)).minutes() + "분 " + moment.duration(t1.diff(t2)).seconds() + "초";
-        setLowestPriceJobCountDownList(lowestPriceJobCountDownList.concat(tempLowestPriceJobCountDownList));
-
-        if (moment.duration(t1.diff(t2)).seconds() < 0) {
-            lowestPriceJobListApi(mainData);
-        }
-    };
-
+    
     /**
      * 최저가 현황 리스트 Api
      * -----------------------------------------------------------------------------------------------------------------
@@ -153,320 +540,7 @@ const Main = () => {
             dispatch(showPopup({ element: Popup }))
         }
     }
-
-    /**
-     * 간병장소 선택
-     * -----------------------------------------------------------------------------------------------------------------
-     */
-
-    const carePlaceSelect = () => {
-        let eventToken = Utils.isAuthCheck() ? "eplqfg" : "kbmp4x"; //## Adjust Event Token
-        let eventType = Utils.isAuthCheck() ? "care_req_g" : "care_req_m"; //## Analytics Event Type
-
-        //### 간병서비스 신청하기
-        Utils.adjustEvent(eventToken);
-        Utils.analyticsEvent(eventType);
-
-        if(Utils.isAuthCheck()){
-            navigate("/care/login")
-            return
-        }
-        
-        //### 작성 중인 공고 있을 때 공고 불러오기 팝업 호출
-        if (LocalStorage.getStorage(LocalStorage.LOAD_WRITE_DATA)) {
-            dispatch(showPopup({element:LoadWritePopup, action:popupAction,type:"popup", actionType:"load"}));
-        } else {
-            if (mainData.patientsCnt === 0) {
-                navigate("/care/select");
-            } else {
-                navigate("/care/family/list");
-            }
-        }
-
-
-    }
-
-
-
-
-
-    /**
-     * 최저가 현황 마감시간 카운트 다운 처리
-     * -----------------------------------------------------------------------------------------------------------------
-     */
-    useEffect(() => {
-        if (mainData.lowestPriceJobList.length > 0) {
-            const interval = setInterval(() => {
-                for (let i = 0; i < mainData.lowestPriceJobList.length; i++) {
-                    if (!Utils.isEmpty(mainData.lowestPriceJobList[i].expired_at)) {
-                        lowestPriceCountDown(i, mainData.lowestPriceJobList[i].expired_at);
-                    }
-                }
-            }, 1000);
-            return () => clearInterval(interval);
-        }
-    }, [mainData.lowestPriceJobList]);
-
-
-
-
-    // 메인 배인 렌더링
-    const renderMainbanner = () => {
-        return (
-            <Swiper
-                spaceBetween={30}
-                slidesPerView={1}
-                className="mySwiper"
-                loop={true}
-                autoplay={{ delay: 2500 }}
-                onSlideChange={(e) => {
-                    setMainBannerPosition(e.realIndex + 1)
-                }}
-                allowTouchMove={true}
-            >
-                <SwiperSlide>
-                    <article className="mainInsur">
-                        <p className="txtStyle05-C333">국내 최초 보험 가입 자동화</p>
-                        <h2 className="txtStyle01">
-                            삼성화재<br />
-                            간병인배상책임보험 출시
-                        </h2>
-                        <img src="../images/mainInsurLogo.svg" alt="케어네이션 x 삼성화재" />
-                    </article>
-                </SwiperSlide>
-                <SwiperSlide>
-                    <article className="mainImg">
-                        <div className="mainImg__txt">
-                            <img src="../images/loginTit.svg" alt="대한민국 1등 간병앱" />
-                            <h2 className="txtStyle01">
-                                <strong>서울</strong>에서 <strong>제주</strong>까지<br />
-                                24시간 <strong>실시간</strong> 매칭 중!
-                            </h2>
-                            <p className="txtStyle05-C333">가장 많은 간병인이 선택했어요!</p>
-                        </div>
-                    </article>
-                </SwiperSlide>
-                <SwiperSlide>
-                    <article className="careMateBan"></article>
-                </SwiperSlide>
-            </Swiper>
-        )
-    }
-
-    // 보호자 후기 렌더링 (swiper 라이브러리는 vertical 시 자동으로 높이를 가지고 있는데 커스텀 안되서 react-slick 사용)
-
-    const renderReview = () => {
-        let settings = {
-            infinite: true,
-            autoplaySpeed: 1000,
-            slidesToShow: 5,
-            slidesToScroll: 1,
-            autoplay: true,
-            vertical: true,
-            arrows: false,
-            touchMove: false
-        };
-        return (
-            <Slider {...settings}>
-                {reviewList}
-            </Slider>
-        )
-    }
-
-
-    const reviewList = useMemo(() => {
-
-        let listData: any[] = [];
-        if (Utils.isEmpty(mainData.mainReviewList) || mainData.mainReviewList.length === 0) {
-            return listData;
-        }
-
-        mainData.mainReviewList.forEach((item: any, index: any) => {
-            listData.push(
-                <a href="" key={index}>
-                    <div className="mainRev__link--tit">
-                        {
-                            Utils.isEmpty(item.prt_user) ?
-                                <h3 className="txtStyle05-Wbold"><span className="txtStyle06-C777W500">탈퇴한 보호자</span></h3>
-                                :
-                                <h3 className="txtStyle05-Wbold">{item.prt_user.name}<span className="txtStyle06-C777W500">보호자</span></h3>
-                        }
-                        <time className="txtStyle06-C777">{(item.created_at)}</time>
-                    </div>
-                    <figure className="ratingGroup">
-                        <img src="../images/reviewStar03.svg" alt="종합평점" />
-                        <figcaption className="txtStyle05">{item.rating.toFixed(1)}</figcaption>
-                    </figure>
-                    <div className="mainRev__link--txt">
-                        <span className="txtStyle06-C333">{Utils.isEmpty(item.cgs_user) ? "탈퇴한 케어메이트에게" : item.cgs_user.name + " 케어메이트에게"}</span>
-                        <p className="txtStyle04-C333">{item.content}</p>
-                    </div>
-                </a>
-            )
-        });
-        return listData;
-    }, [mainData.mainReviewList]);
-
-
-
-    /**
-     * 최저가 현황 리스트 -> 공고 상세 페이지 이동
-     * -----------------------------------------------------------------------------------------------------------------
-     *
-     * @param job : Object Data
-     * @param tabPosition : Tab Position
-    */
-    const moveJobDetail = (job: any, tabPosition: number) => {
-        navigate(`/care/detail/view/${job.job_type}/${job.request_type}/${job.ptr_patients_id}/${job.id}?tab=${tabPosition}`);
-    };
-
-
-    //   /**
-    //  * 보호자님이 남긴 후기 작성 시간 계산
-    //  * -----------------------------------------------------------------------------------------------------------------
-    //  */
-    //    const formatSubmitDate = (createdAt: string) => {
-    //     const curDate = moment();
-    //     const diffSecond = curDate.diff(moment(createdAt), 'seconds');
-
-    //     if (diffSecond < 60) {
-    //         return diffSecond + "초 전";
-    //     } else if (diffSecond < 60 * 60) {
-    //         return Math.floor(moment.duration(curDate.diff(moment(createdAt))).asMinutes()) + "분 전";
-    //     } else if (diffSecond < 60 * 60 * 24) {
-    //         return Math.floor(moment.duration(curDate.diff(moment(createdAt))).asHours()) + "시간 전";
-    //     } else {
-    //         return Math.floor(moment.duration(curDate.diff(moment(createdAt).format("YYYY-MM-DD"))).asDays()) + "일 전";
-    //     }
-    // };
-
-
-    /**
-     * 케어네이션 이용 현황 카운트 Rendering
-     * -----------------------------------------------------------------------------------------------------------------
-     */
-    const renderUsageCount = useMemo(() => {
-        let html: any[] = [];
-        html.push(
-            <React.Fragment key={Math.random()}>
-                <dl className="mainItemWrap__history--list">
-                    <div>
-                        <dt>누적 이용 건수</dt>
-                        <dd><CountUp totalNumber={mainData.careUseList.jobCnt} countUpCheck={countUpCheck} /></dd>
-                    </div>
-                    <div>
-                        <dt><span><CountUp totalNumber={mainData.careUseList.jobCareTimeYear} countUpCheck={countUpCheck} /></span></dt>
-                        <dd>누적 간병시간</dd>
-                    </div>
-                </dl>
-                <div className="mainItemWrap__history--acc">
-                    <h3 className="txtStyle04-C333Wnoml">누적 승인 금액</h3>
-                    <p className="txtStyle03-Bold"><CountUp totalNumber={mainData.careUseList.accumulatedAmount} countUpCheck={countUpCheck} /></p>
-                </div>
-            </React.Fragment>
-        );
-        return html;
-    }, [mainData.careUseList, countUpCheck]);
-
-    /**
-     * 실시간 케어메이트 소식 Rendering
-     * -----------------------------------------------------------------------------------------------------------------
-     */
-
-    //  랜덤으로 나타남
-    //  노란색 : mainNews__list--YL
-    //  초록색 : mainNews__list--GR
-    //  파란색 : mainNews__list--BL
-
-    const renderCareMate = () => {
-        return (
-            <Slider
-                autoplay={true}
-                autoplaySpeed={1000}
-                arrows={false}
-                infinite={true}
-                touchMove={true}
-                slidesToShow={1}
-            >
-                {
-                    mainData.applicantList.map((item: any, index: any) => {
-                        return (
-                            <article className=
-                                {
-                                    "mainNews__list--" +
-                                    (index < 6 ?
-                                        (index % 3 === 0 ? "YL" : (index % 3 === 1 ? "GR" : "BL"))
-                                        :
-                                        (index % 3 === 0 ? "GR" : (index % 3 === 1 ? "BL" : "YL")))
-                                }>
-                                <h3 className="txtStyle03-Wnoml">
-                                    보호자 <strong>{item.name}님</strong> 공고에<br />
-                                    <strong>케어메이트 지원 완료!</strong>
-                                </h3>
-                                <p className="txtStyle04-C555Wnoml">
-                                    {item.loc}
-                                </p>
-                                <div>
-                                    <span className="txtStyle06-W500">총 지원</span>
-                                    <p className="txtStyle01-Wbold">{Utils.numberWithCommas(item.cnt)}명</p>
-                                </div>
-                            </article>
-                        )
-                    })
-                }
-            </Slider>
-        )
-    }
-
-
-    /**
-     * CountUP 감시 (observer intersection)
-     * -----------------------------------------------------------------------------------------------------------------
-     */
-
-    const observerRef = useRef(null);
-
-    useEffect(() => {
-        if (!countUpCheck) {
-            window.scrollTo(0, 0)
-        }
-        if (observerRef.current) {
-            let options = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0
-            }
-
-            const observer = new IntersectionObserver(callback, options);
-            observer.observe(observerRef.current)
-        }
-    }, [observerRef.current])
-
-    const callback = useCallback((entries: any, observer: any) => {
-        entries.forEach((entry: any) => {
-            if (entry.intersectionRatio) {
-                observer.unobserve(observerRef.current);
-                setCountUpCheck(true)
-            }
-        });
-    }, [mainData.careUseList, countUpCheck])
-
-
-
-    /**
-     * Scroll Listener
-     * -----------------------------------------------------------------------------------------------------------------
-     */
-    // const scrollListener = useCallback(() => {
-    //     const scrollTop = document.documentElement.scrollTop; //## 이미 스크롤되어서 보이지 않는 구간의 높이
-    //     const clientHeight = document.documentElement.clientHeight; //## 사용자에게 보여지는 페이지의 높이
-
-    //     //## 케어네이션 이용 현황 스크롤 위치에 닿으면 number scrolling 처리
-    //     if (observerRef.current && observerRef.current?.offsetTop + ((observerRef.current?.offsetHeight) - 70) < (scrollTop + clientHeight)) {
-    //         countUpCheck(true);
-    //     }
-    // }, []);
-
+    
 
 
     //##################################################################################################################
@@ -504,58 +578,6 @@ const Main = () => {
 
 
 
-    const renderLowstPriceApply = () => {
-        let html: any[] = [];
-        mainData.lowestPriceJobList.map((item: any, idx: any) => {
-            if (idx !== 0) {
-                html.push(
-                    <li key={idx}>
-                        {/* <a href=""  onClick={() => moveJobDetail(item, 1)}> */}
-                        <img
-                            src={item.job_type === "day" ? "/images/timeCareUpLabel.svg" : "/images/timeCareDownLabel.svg"}
-                            alt="시간제 간병"
-                            className="timeCareLabel"
-                            onError={Utils.imgSrcError}
-                        />
-                        <div className="Job__list--label">
-                            {
-                                !Utils.isEmpty(item.expired_at) &&
-                                <span className="label RD">
-                                    마감{lowestPriceJobCountDownList[0] ? lowestPriceJobCountDownList[0] : "진행중"}
-                                </span>
-                            }
-                            <span className="label GY">
-                                지원한 케어메이트 : {Utils.numberWithCommas(item.applicant_count)}명
-                            </span>
-                        </div>
-                        <dl className="Job__list--info">
-                            <div>
-                                <dt>간병일</dt>
-                                <dd>{moment(item.job_start_date).format("MM월 DD일 HH시")}</dd>
-                            </div>
-                            <div>
-                                <dt>현재 최저가</dt>
-                                {
-                                    item.job_type === "day" ?
-                                        <dd>
-                                            {Utils.numberWithCommas(item.applicant_min_amount.amount_day_fee)}원
-                                        </dd>
-                                        :
-                                        <dd>
-                                            {Utils.numberWithCommas(item.applicant_min_amount.amount_time_fee)}원
-                                        </dd>
-                                }
-                            </div>
-                        </dl>
-                        {/* </a> */}
-                    </li>
-                )
-            }
-        })
-        return html;
-    }
-
-
 
     //##################################################################################################################
     //##
@@ -580,7 +602,7 @@ const Main = () => {
                         <article className="mainBgGray">
 
                             {
-                                !Utils.isAuthCheck() &&
+                                !Utils.isAuthCheck() && mainData.lowestPriceJobList.length > 0 &&
                                 <div className="commonWrap12">
                                 {/* <!--
                                  모바일 웹일 때 : 공고 없을 경우 공고 없다는 메세지가 따로 보여지게 / 공고 리스트는 app과 같은 형식으로 진행
@@ -612,7 +634,7 @@ const Main = () => {
                                                     window.scrollTo(0,0)
                                                 }}
                                         >
-                                            <span>{!lowestListFlag ? mainData.lowestPriceJobList.length - 2 + "건의 간병 현황 더 보기" : "닫기"}</span>
+                                            <span>{!lowestListFlag ? mainData.lowestPriceJobList.length - 1  + "건의 간병 현황 더 보기" : "닫기"}</span>
                                         </button>
                                     </div>
                                 </div>

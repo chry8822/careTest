@@ -20,6 +20,11 @@ interface RenderCare01Props {
     reFlag?: boolean;            //## 재등록 상태 분기
     disabledHours?: number[];    //## 연장 공고 날짜 선택 분기값 배열
 }
+const CARE_TIME_ARRAY: number[] = [ //## 필요한 간병 시간 Array
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+11, 12, 13, 14, 15, 16, 17, 18,
+19, 20, 21, 22, 23
+];
 
 
 const formatDatePicker: string = "yyyy-MM-dd";
@@ -43,7 +48,6 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
         return [0]
     }
 
-    // console.log("selectDate",registerData.selectDate)
 
 
     //##################################################################################################################
@@ -166,7 +170,6 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
         });
     };
 
-    console.log("startDate" ,moment(Utils.convertDateToString(registerData.startDate)))
 
      /**
      * 시간제 간병 - 필요한 시간 데이터 가공 및 액션 처리
@@ -178,19 +181,17 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
         const {startDate, startTime, selectDate} = registerData;
         const selectDateArr: string[] = selectDate.split(",");
         const endDate = Utils.convertDateToString(selectDateArr[selectDateArr.length - 1]) + ' ' + moment(startTime, formatTimeSecond).format(formatTimeSecond);
-        let selectOption = e.format(formatSelectTime)
+        // let selectOption = e.format(formatSelectTime)
 
 
         setData({
-            selectOption: selectOption,
+            selectOption: e.target.value,
             endDate: moment(endDate).add(Number(endDate), 'hours').format(formatDate),
-            endTime: moment(Utils.convertDateToString(startDate) + ' ' + moment(startTime, formatTimeSecond).format("HH:mm:ss")).add(Number(selectOption), "hours").format(formatHourTime)
+            // endTime: moment(Utils.convertDateToString(startDate) + ' ' + moment(startTime, formatTimeSecond).format("HH:mm:ss")).add(Number(selectOption), "hours").format(formatHourTime)
+            endTime: moment(Utils.convertDateToString(startDate) + ' ' + moment(startTime, formatTimeSecond).format("HH:mm:ss")).add(Number(e.target.value), "hours").format(formatHourTime)
         });
     };
 
-    // console.log("registerData.startDate",registerData.startDate)
-    // console.log("registerData.endTime",registerData.endTime)
-    // console.log("selectOption",registerData.selectOption)
 
     /**
      * 시간제 간병 달력 요일 버튼 처리
@@ -453,7 +454,7 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
                                                 <label htmlFor="finishDate">필요한 간병 시간</label>
                                                 <div className="basicInput__txt--form">
                                                     {/* <select id="finishDate" className="careTimeSelet"> */}
-                                                        <TimePicker
+                                                        {/* <TimePicker
                                                             className=""
                                                             showSecond={false}
                                                             showMinute={false}
@@ -469,7 +470,15 @@ const CareRender01 = ({ registerData, setData, jobType, careTimeCheckMsg, reFlag
                                                             clearIcon={' '}
                                                             defaultValue={moment()}
                                                             disabledHours={disabledTime}
-                                                        />
+                                                        /> */}
+
+                                                    <select id="haveTime" value={Number(registerData.selectOption)}
+                                                                onChange={(e) => changeNeedCareTime(e)}>
+                                                            {CARE_TIME_ARRAY.map((time: number, idx: number) => (
+                                                                    <option value={time} key={idx}>{time}시간</option>
+                                                                )
+                                                            )}
+                                                    </select>
                                                     {/* </select> */}
                                                 </div>
                                             </div>

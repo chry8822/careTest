@@ -60,7 +60,6 @@ const CareRender05 = ({ registerData, setData }: CareRender00Props) => {
         },
     ]
 
-console.log(registerData.paralysis)
     /**
      * 렌더링 마비/거동 상태
      * -----------------------------------------------------------------------------------------------------------------

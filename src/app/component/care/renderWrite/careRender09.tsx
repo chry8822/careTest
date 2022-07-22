@@ -30,9 +30,6 @@ const CareRender09 = ({ registerData, setData }: CareRender00Props) => {
      */
     const popupAction = (type: string) => {
         dispatch(hidePopup());
-        if (type === "overText") { //# 30자 초과시 뒤에서 한글자 삭제
-            setData({ diagnosis: registerData.diagnosis.substring(0, 29) })
-        }
     };
 
     console.log(registerData.diagnosis)
@@ -232,7 +229,9 @@ const CareRender09 = ({ registerData, setData }: CareRender00Props) => {
                         className="select__list--textarea"
                         placeholder="간병 유의사항을 작성해 주세요. (30자 이내)"
                         autoComplete='off'
-                        onChange={(e)=> setData({hospitalizeReason: e.target.value})}
+                        onChange={(e)=> 
+                            setData({hospitalizeReason: e.target.value})
+                        }
                         value={registerData.hospitalizeReason || ""}
                     ></textarea>
                 </div>

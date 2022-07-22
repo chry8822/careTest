@@ -24,6 +24,12 @@ const Popup = () => {
                     <img src="/images/joinLogin.svg" alt="회원가입이나 로그인을 하시겠습니까?" />
                 </figure>
             }
+            {
+                popup.actionType === "cancel" &&
+                <div className="popupWrap__delete">
+                    <figure></figure>
+                </div>
+            }
             <div className="popupWrap__tit">
                 {
                       popup.actionType === "login" ?
@@ -43,7 +49,15 @@ const Popup = () => {
                         <p>이동하시겠어요?</p>
                    </>
                     :
-                    <p dangerouslySetInnerHTML={{__html: Utils.isEmpty(popup.content) ? DEFAULT_MSG : popup.content}}/>
+                    (
+                        popup.actionType === "cancel" ?
+                        <>
+                            <h2><mark>등록하신 공고가 삭제되었습니다.</mark></h2>
+                            <p>감사합니다.</p>
+                        </>
+                        :
+                        <p dangerouslySetInnerHTML={{__html: Utils.isEmpty(popup.content) ? DEFAULT_MSG : popup.content}}/>
+                    )
                 }
             </div>
             <div className="btnWrap">

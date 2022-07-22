@@ -47,7 +47,6 @@ const CareWrite = () => {
 
             //## 공고 불러오기
             let tempLoadWriteData = LocalStorage.getStorage(LocalStorage.LOAD_WRITE_DATA);
-            // console.log("tempLoadWriteData",tempLoadWriteData)
             if (tempLoadWriteData) {
                 let jsonLoadWriteData = JSON.parse(tempLoadWriteData);
                 delete jsonLoadWriteData.step;
@@ -183,8 +182,6 @@ const CareWrite = () => {
         const {startDate, startTime, endDate, endTime, selectDate} = detailPlaceType === "edit" ? editData : careData;
         let checkMsg: string = "";
 
-        console.log("endTime",endTime)
-        // console.log("moment(endTime, formatTime)",moment(endTime, formatTime))
         let tempTimeFormat = "HH:mm:ss";
 
         let dateStart = Utils.convertDateToString(startDate) + ' ' + moment(startTime, tempTimeFormat).format(tempTimeFormat);
@@ -251,7 +248,6 @@ const CareWrite = () => {
             return "badwordsCheck";
         }
 
-        console.log(diagnosis)
         return checkMsg;
     }
 
@@ -324,7 +320,6 @@ const CareWrite = () => {
 
         return checkMsg;
     }
-    console.log(careData.cognitive)
 
 
     
@@ -346,7 +341,6 @@ const CareWrite = () => {
 
         return checkMsg;
     }
-    console.log(careData.cognitive)
 
 
         
@@ -368,7 +362,6 @@ const CareWrite = () => {
 
         return checkMsg;
     }
-    console.log(careData.cognitive)
 
 
     /**
@@ -391,7 +384,6 @@ const CareWrite = () => {
     
             return checkMsg;
         }
-        console.log(careData.cognitive)
     
 
 
@@ -443,13 +435,13 @@ const CareWrite = () => {
         } else {
             let moveStep: number;
             moveStep = (requestType === "home" && step === 4) ? step - 2 : step - 1;
-            navigate(`/care/write/register/${moveStep}/${jobType}/${requestType}`, {replace: true});
+            let paramFamilyId = familyId > 0 ? `/${familyId}` : "";
+            navigate(`/care/write/register/${moveStep}/${jobType}/${requestType}${paramFamilyId}`, {replace: true});
             setStep(moveStep);
         }
         
     }
 
-    console.log("step",step)
 
     /**
      * 다음 버튼 
@@ -559,7 +551,7 @@ const CareWrite = () => {
             }));
         }
 
-        if(step ===9){
+        if ((step === 9 || detailPlaceType === "edit") || (familyId > 0 && step === (requestType === "hospital" ? 3 : 1))){
             let paramType: string = jobId > 0 ? "edit" : "register";
             navigate(`/care/detail/${paramType}/${jobType}/${requestType}/${familyId}/${jobId}`);
         } else {
@@ -572,7 +564,6 @@ const CareWrite = () => {
 
     }
 
-    console.log("step",step)
 
    
 
@@ -776,13 +767,13 @@ const CareWrite = () => {
                                 {renderBottomNotice}
                                 <div className="btnWrap">
                                     <button type="button" className="btnBorder" onClick={prevStep}>이전</button>
-                                    <button type="button" className="btnColor" onClick={moveNextStep}>다음</button>
+                                    <button type="button" className="btnColor" onClick={moveNextStep}>{detailPlaceType === "register" ? "다음" : "적용"}</button>
                                 </div>
                             </div>
                             :
                             <div className="btnWrap">
                                 <button type="button" className="btnBorder" onClick={prevStep}>이전</button>
-                                <button type="button" className="btnColor" onClick={moveNextStep}>다음</button>
+                                <button type="button" className="btnColor" onClick={moveNextStep}>{detailPlaceType === "register" ? "다음" : "적용"}</button>
                             </div>
                     }
 

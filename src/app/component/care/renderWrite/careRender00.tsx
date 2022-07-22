@@ -14,7 +14,6 @@ const CareRender00 = ({ registerData, setData }: CareRender00Props) => {
     //## >> Method : Default Rendering
     //##
     //##################################################################################################################
-    console.log(registerData.coronaCheck)
     return (
         <>
             <section className="select">

@@ -33,10 +33,10 @@ const Header = ({logoHeader=false ,historyBack = false, title = "", headerClass 
             return;
         }
 
-        // if (historyBackInterface) {
-        //     Utils.pageFinish();
-        //     return;
-        // }
+        if (historyBackInterface) {
+            Utils.pageFinish();
+            return;
+        }
 
         if (newWindow) {
             window.close();

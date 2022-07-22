@@ -4,11 +4,34 @@ import moment from 'moment';
 
 const IMG_PATH = process.env.REACT_APP_IMG_URL;
 const ENCRYPTION_TYPE = process.env.REACT_APP_ENCRYPTION_TYPE;
+const SERVER_TYPE = process.env.REACT_APP_SERVER_TYPE;
 
 
 const crypto = require('crypto');
 const pkcs7 = require("pkcs7");
 const chainingMode = "AES-256-CBC";
+
+/**
+ * Send Device Log
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param message : Error Message
+ */
+ export function sendDeviceLog(message: string) {
+    try {
+        if (osCheck() === 'android') {
+            const androidHandler = androidDevice();
+            androidHandler.sendDeviceLog(message);
+        } else if (osCheck() === 'ios') {
+            let iosData = {
+                message: message
+            };
+            const iosHandler = iosDevice('sendDeviceLog');
+            iosHandler.postMessage(iosData);
+        }
+    } catch (e) {}
+}
+
 
 
 /**
@@ -526,7 +549,6 @@ export function convertTimeToString(momentTime: any) {
                         callback(true);
                         return;
                     }
-                    console.log("금칙어",response.data.data)
 
                     let arr: any[] = [];
                         for (let i = 0; i < response.data.data.length; i++) {
@@ -551,6 +573,95 @@ export function convertTimeToString(momentTime: any) {
         callback(false);
         return;
     }
+}
+
+/**
+ * RSA / AES 암호화
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param data : 암호화 데이터
+ */
+ export function doubleEncryption(data: any) {
+    let rsaPublicKey = LocalStorage.getStorage(LocalStorage.RSA_PUBLIC_KEY);
+    if (!isAuthCheck() && !isEmpty(rsaPublicKey)) {
+        let rsaData: any = encryptRSA(data);
+        let aesData: string = encryptAES256(JSON.stringify(rsaData));
+        return aesData;
+    } else {
+        return null;
+    }
+}
+
+/**
+ * RSA 암호화
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param data : 암호화 데이터
+ */
+ export function encryptRSA(data: any, auth?: string) {
+    let rsaPublicKey = LocalStorage.getStorage(LocalStorage.RSA_PUBLIC_KEY);
+
+    if (!rsaPublicKey) {
+        return;
+    }
+
+    let obj: any = {};
+    for (let item in data) {
+        let value = data[item];
+        value = typeof value === "number" ? value.toString() : value;
+        if ((!isEmpty(authSubStr()) || !isEmpty(auth)) && item.includes(auth ? (auth.substr(7, 8) + "_") : authSubStr())) {
+            value = crypto.publicEncrypt({key: rsaPublicKey, padding: crypto.constants.RSA_PKCS1_PADDING }, Buffer.from(value, 'utf8') ).toString('base64');
+        }
+        obj = {
+            ...obj,
+            [item]: value
+        };
+    }
+    return obj;
+}
+
+/**
+ * Auth Sub Prefix(7번째부터 8개  스트링 사용)
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param type : aes
+ */
+ export function authSubStr() {
+    let authSubStrFlag = false;
+    encryptionVersionCheck(function (flag: boolean) {
+        authSubStrFlag = flag;
+    });
+
+    if (!authSubStrFlag) {
+        return "";
+    }
+
+    let auth = LocalStorage.getStorage(LocalStorage.AUTHORIZATION);
+    if (!auth) {
+        return "";
+    }
+    if (auth.trim().length === 0) {
+        return "";
+    }
+    let authSubStr = auth.substr(7, 8);
+
+    return authSubStr + "_";
+}
+
+
+/**
+ * 암호화 버전 체크
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * @param callback : CallBack Function
+ */
+ export function encryptionVersionCheck(callback: any) {
+    if ((SERVER_TYPE === "REAL" || SERVER_TYPE === "QA") && ENCRYPTION_TYPE === "TRUE" && (osCheck() === 'android' || osCheck() === 'ios')) {
+        callback(true);
+        return;
+    }
+    callback(false);
+    return;
 }
 
 /**
@@ -628,4 +739,21 @@ export function convertTimeToString(momentTime: any) {
     const ivKey = byteChange(16); //## 16byte
 
     return encrypt(str);
+}
+
+
+/**
+ * History Clear
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+ export function clearHistory() {
+    try {
+        if (osCheck() === 'android') {
+            const androidHandler = androidDevice();
+            androidHandler.clearHistory();
+        } else if (osCheck() === 'ios') {
+            const iosHandler = iosDevice('clearHistory');
+            iosHandler.postMessage('');
+        }
+    } catch (e) {}
 }

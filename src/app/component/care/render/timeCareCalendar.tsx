@@ -145,12 +145,6 @@ const RenderTimeCalendar = ({curDate, jobData,selectCareDate}: RenderCalendarPro
         return html;
     };
                      
-    // let testDate = moment("2022-07-01") 
-    // let currentDate = moment("2022-06-26")
-    // console.log("sdfdsf", moment(testDate).week() - moment(testDate).startOf("month").week() )
-    // console.log("sdfdsf",moment(testDate).subtract(moment(testDate).days(),"days").format("YY-MM-DD") === currentDate.format("YY-MM-DD"))
-
-    
 
    //##################################################################################################################
     //##

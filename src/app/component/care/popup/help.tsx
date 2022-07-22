@@ -39,42 +39,69 @@ const ExplanationRoomPopup = () => {
         return html;
     }, [popup.actionType, position]);
 
+        let detailPopupIndex = useMemo(()=> {
+            return  Number(popup.content)
+        },[popup.content]) 
     
     return (
         <>
                 <div className="bottomPopupWrap">
                     <div className="bottomPopup__detail">
                     {
-                        (popup.actionType && (DetailHelpInfo.careHelpInfo00 || helpInfo.length > 1 )) && Utils.isEmpty(popup.title) &&
-                        <div className="headerTabWrap">
-                            <ul className="popupWrap__tab" role="tablist">
-                                {renderTab}
-                            </ul>
-                        </div>
+                        (popup.actionType && helpInfo.length > 1) && Utils.isEmpty(popup.title) && Utils.isEmpty(popup.content) &&
+                                <ul className="popupWrap__tab" role="tablist">
+                                    {renderTab}
+                                </ul>
                     }
-                    {
-                        helpInfo &&
                         <div className="commonWrap04">
-                            <div role="tabpanel">
-                                <figure className='popupWrap__grayBox'>
-                                    <img src={helpInfo[position].img} alt={helpInfo[position].title} aria-hidden onError={Utils.imgSrcError}/>
-                                </figure>
-                                <div className='popupWrap__tit'>
-                                    <h2 className="popupWrap__tit--help">
-                                        <mark>{helpInfo[position].title}</mark>
-                                    </h2>
-                                    <p className='line3' dangerouslySetInnerHTML={{__html: Dompurify.sanitize(helpInfo[position].content)}}/>
-                                </div>
-                            </div>
-                                <div className="btnWrap mt40">
-                                    <button 
-                                        type="button" 
-                                        className="btnColor"
-                                        onClick={()=> popup.action(popup.actionType)}
-                                    >확인</button>
-                                </div>
+
+                                {
+                                    !Utils.isEmpty(popup.content) && popup.content != undefined ? 
+                                    <>  
+                                        <div role="tabpanel">
+                                            <figure className='popupWrap__grayBox'>
+                                                <img src={helpInfo[detailPopupIndex].img} alt={helpInfo[detailPopupIndex].title} aria-hidden onError={Utils.imgSrcError}/>
+                                            </figure>
+                                            <div className='popupWrap__tit'>
+                                                <h2 className="popupWrap__tit--help">
+                                                    <mark>{helpInfo[detailPopupIndex].title}</mark>
+                                                </h2>
+                                                <p className='line3' dangerouslySetInnerHTML={{__html: Dompurify.sanitize(helpInfo[detailPopupIndex].content)}}/>
+                                            </div>
+                                        </div>
+                                        <div className="btnWrap mt40">
+                                            <button 
+                                                type="button" 
+                                                className="btnColor"
+                                                onClick={()=> popup.action(popup.actionType)}
+                                            >확인</button>
+                                        </div>
+                                    </>
+
+                                    :
+                                    <>
+                                     
+                                        <div role="tabpanel">
+                                            <figure className='popupWrap__grayBox'>
+                                                <img src={helpInfo[position].img} alt={helpInfo[position].title} aria-hidden onError={Utils.imgSrcError}/>
+                                            </figure>
+                                            <div className='popupWrap__tit'>
+                                                <h2 className="popupWrap__tit--help">
+                                                    <mark>{helpInfo[position].title}</mark>
+                                                </h2>
+                                                <p className='line3' dangerouslySetInnerHTML={{__html: Dompurify.sanitize(helpInfo[position].content)}}/>
+                                            </div>
+                                        </div>
+                                        <div className="btnWrap mt40">
+                                            <button 
+                                                type="button" 
+                                                className="btnColor"
+                                                onClick={()=> popup.action(popup.actionType)}
+                                            >확인</button>
+                                        </div>
+                                    </>
+                                }
                         </div>
-                    }
                     </div>
                 </div>
         </>

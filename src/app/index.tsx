@@ -13,9 +13,16 @@ import {
     CareWrite,
     CareDetail,
     CareFamily,
-    ThirdPartyDetail
+    ThirdPartyDetail,
+    CareSuccess,
+    CareHistory,
+    CareExtendCancel,
+    ZoomMap,
+    CommunityList
 } from "./component";
 import Popup from './container/popup/popup';
+import Loading from './container/loading/loading';
+import MainNavigator from './component/main/navigator/navigator';
 
 const persistor = persistStore(store);
 
@@ -24,21 +31,31 @@ const Root: React.FC  = ()=> {
         <>
             <Provider store={store}>
                 <PersistGate loading={null} persistor={persistor}>
+                    <Loading/>
                     <BrowserRouter>
                       <Routes>
                         <Route path="/" element={<Main/>}/>
+                        <Route path="community/list" element={<CommunityList/>}/>
+                        <Route path="job/list" element={<CareHistory/>}>
+                            <Route path=":tab/" element={<CareHistory/>}/>
+                            <Route path=":tab/:type" element={<CareHistory/>}/>
+                        </Route>
                         <Route path="care">
+                            <Route path="map/:lat/:lon" element={<ZoomMap/>} />
+                            <Route path="cancel/:jobId/:status" element={<CareExtendCancel/>}/>
                             <Route path="login" element={<Login/>}/>
                             <Route path="select" element={<CareExtend/>} />
                             <Route path="place">
-                                <Route path=":type/:time/:place" element={<CarePlace/>}>
-                                    <Route path=":jobId" element={<CarePlace/>}/>
+                               <Route path=":type/:time/:place" element={<CarePlace/>}>
+                                    <Route path=":familyId" element={<CarePlace/>}/>
+                                    <Route path=":familyId/:jobId" element={<CarePlace/>}/>
                                 </Route>
                             </Route>
                             <Route path="family/list" element={<CareFamily/>}/>
                             <Route path="write">
                                 <Route path=":type/:step/:time/:place" element={<CareWrite/>}/>
                                 <Route path=":type/:step/:time/:place/:familyId" element={<CareWrite/>}/>
+                                <Route path=":type/:step/:time/:place/:familyId/:jobId" element={<CareWrite/>}/>
                             </Route>
                             <Route path="detail">
                                 <Route path="thirdParty" element={<ThirdPartyDetail/>}/>
@@ -46,8 +63,10 @@ const Root: React.FC  = ()=> {
                                 <Route path=":type/:time/:place/:familyId" element={<CareDetail/>}/>
                                 <Route path=":type/:time/:place/:familyId/:jobId" element={<CareDetail/>}/>
                             </Route>
+                            <Route path="success" element={<CareSuccess/>}/>
                         </Route>
                       </Routes>
+                     <MainNavigator/>
                      <Popup/>
                     </BrowserRouter>
                 </PersistGate>
